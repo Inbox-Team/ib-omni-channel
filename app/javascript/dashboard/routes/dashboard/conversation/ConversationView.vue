@@ -7,6 +7,7 @@ import ConversationBox from '../../../components/widgets/conversation/Conversati
 import wootConstants from 'dashboard/constants/globals';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
 import CmdBarConversationSnooze from 'dashboard/routes/dashboard/commands/CmdBarConversationSnooze.vue';
+import CmdBarOpenUntil from 'dashboard/routes/dashboard/commands/CmdBarOpenUntil.vue';
 import { emitter } from 'shared/helpers/mitt';
 import SidepanelSwitch from 'dashboard/components-next/Conversation/SidepanelSwitch.vue';
 import ConversationSidebar from 'dashboard/components/widgets/conversation/ConversationSidebar.vue';
@@ -16,6 +17,7 @@ export default {
     ChatList,
     ConversationBox,
     CmdBarConversationSnooze,
+    CmdBarOpenUntil,
     SidepanelSwitch,
     ConversationSidebar,
   },
@@ -215,5 +217,6 @@ export default {
     </ConversationBox>
     <ConversationSidebar v-if="shouldShowSidebar" :current-chat="currentChat" />
     <CmdBarConversationSnooze />
+    <CmdBarOpenUntil />
   </section>
 </template>

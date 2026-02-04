@@ -72,12 +72,23 @@ const isSnoozed = computed(
   () => currentChat.value.status === wootConstants.STATUS_TYPE.SNOOZED
 );
 
+const isOpen = computed(
+  () => currentChat.value.status === wootConstants.STATUS_TYPE.OPEN
+);
+
 const snoozedDisplayText = computed(() => {
   const { snoozed_until: snoozedUntil } = currentChat.value;
   if (snoozedUntil) {
     return `${t('CONVERSATION.HEADER.SNOOZED_UNTIL')} ${snoozedReopenTime(snoozedUntil)}`;
   }
   return t('CONVERSATION.HEADER.SNOOZED_UNTIL_NEXT_REPLY');
+});
+
+const openUntilDisplayText = computed(() => {
+  if (!isOpen.value) return null;
+  const { snoozed_until: snoozedUntil } = currentChat.value;
+  if (!snoozedUntil) return null;
+  return `${t('CONVERSATION.HEADER.OPEN_UNTIL')} ${snoozedReopenTime(snoozedUntil)}`;
 });
 
 const inbox = computed(() => {
@@ -137,6 +148,12 @@ const hasSlaPolicyId = computed(() => props.chat?.sla_policy_id);
           <InboxName v-if="hasMultipleInboxes" :inbox="inbox" class="!mx-0" />
           <span v-if="isSnoozed" class="font-medium text-n-amber-10">
             {{ snoozedDisplayText }}
+          </span>
+          <span
+            v-else-if="openUntilDisplayText"
+            class="font-medium text-n-amber-10"
+          >
+            {{ openUntilDisplayText }}
           </span>
         </div>
       </div>
