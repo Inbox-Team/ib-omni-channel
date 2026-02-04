@@ -40,7 +40,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: docker/Dockerfile
           push: true
           # Truyền các biến ARG vào Dockerfile để tránh lỗi 'RUN if'
           build-args: |
