@@ -31,7 +31,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/ib-chatwoot:latest
+            ghcr.io/${{ toLower(github.repository_owner) }}/ib-chatwoot:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
