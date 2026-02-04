@@ -70,9 +70,9 @@ RUN bundle config set --local force_ruby_platform true
 ARG RAILS_ENV
 RUN if [ "$RAILS_ENV" = "production" ]; then \
   bundle config set without 'development test'; \
-  bundle install --jobs=4 --retry=3 --verbose 2>&1 | tee /tmp/bundle.log || (cat /tmp/bundle.log && exit 1); \
+  bundle install --jobs=2 --retry=3 --verbose; \
   else \
-  bundle install --jobs=4 --retry=3 --verbose 2>&1 | tee /tmp/bundle.log || (cat /tmp/bundle.log && exit 1); \
+  bundle install --jobs=2 --retry=3 --verbose; \
   fi
 
 COPY package.json pnpm-lock.yaml ./
