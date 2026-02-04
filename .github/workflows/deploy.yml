@@ -38,6 +38,8 @@ jobs:
           context: .
           file: ./Dockerfile 
           push: true
+          build-args: |
+            RAILS_ENV=production
           tags: |
             ghcr.io/${{ steps.prep.outputs.owner }}/ib-chatwoot:latest
           cache-from: type=gha
