@@ -40,11 +40,11 @@ COPY Gemfile Gemfile.lock ./
 RUN gem install bundler -v 2.5.11 && \
     bundle config set --local force_ruby_platform true && \
     bundle config set --local without "${BUNDLE_WITHOUT}" && \
-    bundle install --jobs=4 --retry=3
+    bundle install --jobs=2 --retry=3 --verbose 2>&1 | tee /tmp/bundle-install.log || (cat /tmp/bundle-install.log && exit 1)
 
 # Cài đặt Node packages
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile || pnpm install
 
 # Copy toàn bộ code và Build Assets
 COPY . .
