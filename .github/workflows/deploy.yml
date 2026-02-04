@@ -1,42 +1,68 @@
-name: Deploy Chatwoot Fork
+name: Chatwoot Flow
 
 on:
   push:
-    branches: [ "dev/nova" ]
+    branches:
+      - dev/nova  # Kích hoạt khi push vào nhánh dev/nova
+
+permissions:
+  packages: write
+  contents: read
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Login to GHCR
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          # Sử dụng driver docker-container để hỗ trợ xuất cache 'gha'
+          driver: docker-container
+
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push
+      - name: Lowercase Repository Info
+        id: prep
+        run: |
+          # Chuyển tên owner và repo về chữ thường để GHCR chấp nhận
+          echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "repo=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Image
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile
           push: true
-          # Quan trọng: Truyền build-args để Dockerfile nhận diện đúng môi trường
+          # Truyền các biến ARG vào Dockerfile để tránh lỗi 'RUN if'
           build-args: |
             RAILS_ENV=production
             BUNDLE_WITHOUT=development:test
-          tags: ghcr.io/${{ github.repository_owner }}/ib-chatwoot:latest
+          # Tag image theo định dạng ghcr.io/username/repo:latest
+          tags: |
+            ghcr.io/${{ steps.prep.outputs.owner }}/${{ steps.prep.outputs.repo }}:latest
+          # Cấu hình Cache tối ưu cho GitHub Actions
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy:
-    needs: build
+  deploy-to-caprover:
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger CapRover Webhook
+      - name: Deploy Rails App via Webhook
         run: |
+          echo "Triggering Webhook cho Rails App..."
           curl -X POST "${{ secrets.CAPROVER_WEBHOOK_WEB }}"
+
+      - name: Deploy Sidekiq via Webhook
+        run: |
+          echo "Triggering Webhook cho Sidekiq Worker..."
           curl -X POST "${{ secrets.CAPROVER_WEBHOOK_SIDEKIQ }}"
