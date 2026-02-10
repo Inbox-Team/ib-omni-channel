@@ -52,6 +52,13 @@ const showOpenButton = computed(() => {
   return isPending.value || isSnoozed.value;
 });
 
+const currentStatusLabel = computed(() => {
+  const status = currentChat.value?.status;
+  if (!status) return '';
+  const key = `CONVERSATION.HEADER.STATUS_${status.toUpperCase()}`;
+  return t(key);
+});
+
 const getConversationParams = () => {
   const allConversations = document.querySelectorAll(
     '.conversations-list .conversation'
@@ -75,6 +82,12 @@ const getConversationParams = () => {
 const openSnoozeModal = () => {
   const ninja = document.querySelector('ninja-keys');
   ninja.open({ parent: 'snooze_conversation' });
+};
+
+const openOpenUntilModal = () => {
+  closeDropdown();
+  const ninja = document.querySelector('ninja-keys');
+  ninja.open({ parent: 'open_until_conversation' });
 };
 
 const toggleStatus = (status, snoozedUntil) => {
@@ -133,7 +146,10 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
 </script>
 
 <template>
-  <div class="relative flex items-center justify-end resolve-actions">
+  <div class="relative flex items-center justify-end gap-2 resolve-actions">
+    <span class="text-xs text-n-slate-11 whitespace-nowrap">
+      {{ t('CONVERSATION.HEADER.STATUS_LABEL') }}: {{ currentStatusLabel }}
+    </span>
     <ButtonGroup
       class="rounded-lg shadow outline-1 outline flex-shrink-0"
       :class="!showOpenButton ? 'outline-n-container' : 'outline-transparent'"
@@ -196,6 +212,18 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
             icon="i-lucide-alarm-clock-minus"
             class="w-full"
             @click="() => openSnoozeModal()"
+          />
+        </WootDropdownItem>
+        <WootDropdownItem v-if="isOpen">
+          <Button
+            :label="t('CONVERSATION.RESOLVE_DROPDOWN.OPEN_UNTIL')"
+            ghost
+            slate
+            sm
+            start
+            icon="i-lucide-clock"
+            class="w-full"
+            @click="() => openOpenUntilModal()"
           />
         </WootDropdownItem>
         <WootDropdownItem v-if="!isPending">

@@ -3,6 +3,7 @@ import { emitter } from 'shared/helpers/mitt';
 
 import {
   CMD_MUTE_CONVERSATION,
+  CMD_OPEN_UNTIL_CONVERSATION,
   CMD_REOPEN_CONVERSATION,
   CMD_RESOLVE_CONVERSATION,
   CMD_SEND_TRANSCRIPT,
@@ -54,6 +55,35 @@ export const SNOOZE_CONVERSATION_ACTIONS = [
     CMD_SNOOZE_CONVERSATION,
     'snooze_conversation',
     'COMMAND_BAR.SECTIONS.SNOOZE_CONVERSATION'
+  ),
+];
+
+const OPEN_UNTIL_OPTIONS = Object.values(SNOOZE_OPTIONS).filter(
+  option => option !== SNOOZE_OPTIONS.UNTIL_NEXT_REPLY
+);
+
+const createOpenUntilHandlers = (busEventName, parentId, section) =>
+  OPEN_UNTIL_OPTIONS.map(option => ({
+    id: option,
+    title: `COMMAND_BAR.COMMANDS.${option.toUpperCase()}`,
+    parent: parentId,
+    section,
+    icon: ICON_SNOOZE_CONVERSATION,
+    handler: () => emitter.emit(busEventName, option),
+  }));
+
+export const OPEN_UNTIL_CONVERSATION_ACTIONS = [
+  {
+    id: 'open_until_conversation',
+    title: 'COMMAND_BAR.COMMANDS.OPEN_UNTIL_CONVERSATION',
+    section: 'COMMAND_BAR.SECTIONS.CONVERSATION',
+    icon: ICON_SNOOZE_CONVERSATION,
+    children: OPEN_UNTIL_OPTIONS,
+  },
+  ...createOpenUntilHandlers(
+    CMD_OPEN_UNTIL_CONVERSATION,
+    'open_until_conversation',
+    'COMMAND_BAR.SECTIONS.OPEN_UNTIL_CONVERSATION'
   ),
 ];
 

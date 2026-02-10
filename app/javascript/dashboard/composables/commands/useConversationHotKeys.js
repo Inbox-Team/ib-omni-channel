@@ -31,9 +31,10 @@ import {
 
 import {
   OPEN_CONVERSATION_ACTIONS,
-  SNOOZE_CONVERSATION_ACTIONS,
+  OPEN_UNTIL_CONVERSATION_ACTIONS,
   RESOLVED_CONVERSATION_ACTIONS,
   SEND_TRANSCRIPT_ACTION,
+  SNOOZE_CONVERSATION_ACTIONS,
   UNMUTE_ACTION,
   MUTE_ACTION,
 } from 'dashboard/helper/commandbar/actions';
@@ -206,7 +207,11 @@ export function useConversationHotKeys() {
 
     let actions = [];
     if (isOpen) {
-      actions = [...OPEN_CONVERSATION_ACTIONS, ...SNOOZE_CONVERSATION_ACTIONS];
+      actions = [
+        ...OPEN_CONVERSATION_ACTIONS,
+        ...SNOOZE_CONVERSATION_ACTIONS,
+        ...OPEN_UNTIL_CONVERSATION_ACTIONS,
+      ];
     } else if (isResolved || isSnoozed) {
       actions = RESOLVED_CONVERSATION_ACTIONS;
     }
@@ -394,7 +399,10 @@ export function useConversationHotKeys() {
 
   const conversationHotKeys = computed(() => {
     if (shouldShowSnoozeOption.value) {
-      return prepareActions(SNOOZE_CONVERSATION_ACTIONS, t);
+      return prepareActions(
+        [...SNOOZE_CONVERSATION_ACTIONS, ...OPEN_UNTIL_CONVERSATION_ACTIONS],
+        t
+      );
     }
     if (isConversationOrInboxRoute.value) {
       return getDefaultConversationHotKeys.value;
