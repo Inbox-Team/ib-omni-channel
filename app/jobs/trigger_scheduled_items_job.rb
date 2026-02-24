@@ -14,6 +14,9 @@ class TriggerScheduledItemsJob < ApplicationJob
     # Job to turn open conversations to pending when snoozed_until has passed
     Conversations::OpenToPendingJob.perform_later
 
+    # Job to turn pending conversations to open when snoozed_until (open at) has passed
+    Conversations::PendingToOpenJob.perform_later
+
     # Job to reopen snoozed notifications
     Notification::ReopenSnoozedNotificationsJob.perform_later
 

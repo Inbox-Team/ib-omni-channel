@@ -230,8 +230,8 @@ class Conversation < ApplicationRecord
   end
 
   def ensure_snooze_until_reset
-    # Keep snoozed_until only for snoozed (reopen at) or open (pending at); clear otherwise
-    self.snoozed_until = nil unless snoozed? || open?
+    # Keep snoozed_until for snoozed (reopen at), open (pending at), or pending (open at); clear otherwise
+    self.snoozed_until = nil unless snoozed? || open? || pending?
   end
 
   def ensure_waiting_since
