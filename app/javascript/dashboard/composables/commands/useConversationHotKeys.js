@@ -31,7 +31,7 @@ import {
 
 import {
   OPEN_CONVERSATION_ACTIONS,
-  OPEN_UNTIL_CONVERSATION_ACTIONS,
+  PENDING_AT_CONVERSATION_ACTIONS,
   RESOLVED_CONVERSATION_ACTIONS,
   SEND_TRANSCRIPT_ACTION,
   SNOOZE_CONVERSATION_ACTIONS,
@@ -210,7 +210,7 @@ export function useConversationHotKeys() {
       actions = [
         ...OPEN_CONVERSATION_ACTIONS,
         ...SNOOZE_CONVERSATION_ACTIONS,
-        ...OPEN_UNTIL_CONVERSATION_ACTIONS,
+        ...PENDING_AT_CONVERSATION_ACTIONS,
       ];
     } else if (isResolved || isSnoozed) {
       actions = RESOLVED_CONVERSATION_ACTIONS;
@@ -400,7 +400,7 @@ export function useConversationHotKeys() {
   const conversationHotKeys = computed(() => {
     if (shouldShowSnoozeOption.value) {
       return prepareActions(
-        [...SNOOZE_CONVERSATION_ACTIONS, ...OPEN_UNTIL_CONVERSATION_ACTIONS],
+        [...SNOOZE_CONVERSATION_ACTIONS, ...PENDING_AT_CONVERSATION_ACTIONS],
         t
       );
     }

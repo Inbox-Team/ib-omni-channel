@@ -12,7 +12,7 @@ import InboxCard from 'dashboard/components-next/Inbox/InboxCard.vue';
 import InboxListHeader from './components/InboxListHeader.vue';
 import IntersectionObserver from 'dashboard/components/IntersectionObserver.vue';
 import CmdBarConversationSnooze from 'dashboard/routes/dashboard/commands/CmdBarConversationSnooze.vue';
-import CmdBarOpenUntil from 'dashboard/routes/dashboard/commands/CmdBarOpenUntil.vue';
+import CmdBarPendingAt from 'dashboard/routes/dashboard/commands/CmdBarPendingAt.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 
 const { t } = useI18n();
@@ -273,6 +273,6 @@ onMounted(() => {
     </div>
     <router-view />
     <CmdBarConversationSnooze />
-    <CmdBarOpenUntil />
+    <CmdBarPendingAt />
   </section>
 </template>

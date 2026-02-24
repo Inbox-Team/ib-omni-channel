@@ -1,4 +1,4 @@
-class Conversations::OpenUntilToPendingJob < ApplicationJob
+class Conversations::OpenToPendingJob < ApplicationJob
   queue_as :low
 
   def perform

@@ -82,10 +82,10 @@ const getConversationParams = () => {
 //   ninja.open({ parent: 'snooze_conversation' });
 // };
 
-const openOpenUntilModal = () => {
+const openPendingAtModal = () => {
   closeDropdown();
   const ninja = document.querySelector('ninja-keys');
-  ninja.open({ parent: 'open_until_conversation' });
+  ninja.open({ parent: 'pending_at_conversation' });
 };
 
 const toggleStatus = (status, snoozedUntil) => {
@@ -213,7 +213,7 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
             start
             icon="i-lucide-clock"
             class="w-full"
-            @click="() => openOpenUntilModal()"
+            @click="() => openPendingAtModal()"
           />
         </WootDropdownItem>
         <WootDropdownItem v-if="isOpen">
