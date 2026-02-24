@@ -84,11 +84,11 @@ const snoozedDisplayText = computed(() => {
   return t('CONVERSATION.HEADER.SNOOZED_UNTIL_NEXT_REPLY');
 });
 
-const openUntilDisplayText = computed(() => {
+const pendingAtDisplayText = computed(() => {
   if (!isOpen.value) return null;
   const { snoozed_until: snoozedUntil } = currentChat.value;
   if (!snoozedUntil) return null;
-  return `${t('CONVERSATION.HEADER.OPEN_UNTIL')} ${snoozedReopenTime(snoozedUntil)}`;
+  return `${t('CONVERSATION.HEADER.PENDING_AT')} ${snoozedReopenTime(snoozedUntil)}`;
 });
 
 const inbox = computed(() => {
@@ -150,10 +150,10 @@ const hasSlaPolicyId = computed(() => props.chat?.sla_policy_id);
             {{ snoozedDisplayText }}
           </span>
           <span
-            v-else-if="openUntilDisplayText"
+            v-else-if="pendingAtDisplayText"
             class="font-medium text-n-amber-10"
           >
-            {{ openUntilDisplayText }}
+            {{ pendingAtDisplayText }}
           </span>
         </div>
       </div>
