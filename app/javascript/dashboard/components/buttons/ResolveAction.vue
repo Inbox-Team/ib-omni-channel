@@ -44,7 +44,7 @@ const isSnoozed = computed(
   () => currentChat.value.status === wootConstants.STATUS_TYPE.SNOOZED
 );
 
-const showAdditionalActions = computed(() => isOpen.value);
+const showAdditionalActions = computed(() => isOpen.value || isPending.value);
 
 const showOpenButton = computed(() => {
   return isPending.value || isSnoozed.value;
@@ -86,6 +86,12 @@ const openPendingAtModal = () => {
   closeDropdown();
   const ninja = document.querySelector('ninja-keys');
   ninja.open({ parent: 'pending_at_conversation' });
+};
+
+const openOpenAtModal = () => {
+  closeDropdown();
+  const ninja = document.querySelector('ninja-keys');
+  ninja.open({ parent: 'open_at_conversation' });
 };
 
 const toggleStatus = (status, snoozedUntil) => {
@@ -182,6 +188,11 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
         size="sm"
         color="slate"
         no-animation
+        :class="
+          showAdditionalActions
+            ? 'ltr:rounded-r-none rtl:rounded-l-none !outline-0'
+            : '!outline-0'
+        "
         :is-loading="isLoading"
         @click="onCmdOpenConversation"
       />
@@ -226,6 +237,18 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
             icon="i-lucide-circle-dot-dashed"
             class="w-full"
             @click="() => toggleStatus(wootConstants.STATUS_TYPE.PENDING)"
+          />
+        </WootDropdownItem>
+        <WootDropdownItem v-if="isPending">
+          <Button
+            :label="t('CONVERSATION.RESOLVE_DROPDOWN.OPEN_AT')"
+            ghost
+            slate
+            sm
+            start
+            icon="i-lucide-clock"
+            class="w-full"
+            @click="() => openOpenAtModal()"
           />
         </WootDropdownItem>
       </WootDropdownMenu>
