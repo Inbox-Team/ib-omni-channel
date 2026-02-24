@@ -76,6 +76,10 @@ const isOpen = computed(
   () => currentChat.value.status === wootConstants.STATUS_TYPE.OPEN
 );
 
+const isPending = computed(
+  () => currentChat.value.status === wootConstants.STATUS_TYPE.PENDING
+);
+
 const snoozedDisplayText = computed(() => {
   const { snoozed_until: snoozedUntil } = currentChat.value;
   if (snoozedUntil) {
@@ -89,6 +93,13 @@ const pendingAtDisplayText = computed(() => {
   const { snoozed_until: snoozedUntil } = currentChat.value;
   if (!snoozedUntil) return null;
   return `${t('CONVERSATION.HEADER.PENDING_AT')} ${snoozedReopenTime(snoozedUntil)}`;
+});
+
+const openAtDisplayText = computed(() => {
+  if (!isPending.value) return null;
+  const { snoozed_until: snoozedUntil } = currentChat.value;
+  if (!snoozedUntil) return null;
+  return `${t('CONVERSATION.HEADER.OPEN_AT')} ${snoozedReopenTime(snoozedUntil)}`;
 });
 
 const inbox = computed(() => {
@@ -154,6 +165,12 @@ const hasSlaPolicyId = computed(() => props.chat?.sla_policy_id);
             class="font-medium text-n-amber-10"
           >
             {{ pendingAtDisplayText }}
+          </span>
+          <span
+            v-else-if="openAtDisplayText"
+            class="font-medium text-n-amber-10"
+          >
+            {{ openAtDisplayText }}
           </span>
         </div>
       </div>

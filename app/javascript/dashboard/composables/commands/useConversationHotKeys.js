@@ -30,6 +30,7 @@ import {
 } from 'dashboard/helper/commandbar/icons';
 
 import {
+  OPEN_AT_CONVERSATION_ACTIONS,
   OPEN_CONVERSATION_ACTIONS,
   PENDING_AT_CONVERSATION_ACTIONS,
   RESOLVED_CONVERSATION_ACTIONS,
@@ -200,6 +201,8 @@ export function useConversationHotKeys() {
 
   const statusActions = computed(() => {
     const isOpen = currentChat.value?.status === wootConstants.STATUS_TYPE.OPEN;
+    const isPending =
+      currentChat.value?.status === wootConstants.STATUS_TYPE.PENDING;
     const isSnoozed =
       currentChat.value?.status === wootConstants.STATUS_TYPE.SNOOZED;
     const isResolved =
@@ -211,6 +214,11 @@ export function useConversationHotKeys() {
         ...OPEN_CONVERSATION_ACTIONS,
         ...SNOOZE_CONVERSATION_ACTIONS,
         ...PENDING_AT_CONVERSATION_ACTIONS,
+      ];
+    } else if (isPending) {
+      actions = [
+        ...RESOLVED_CONVERSATION_ACTIONS,
+        ...OPEN_AT_CONVERSATION_ACTIONS,
       ];
     } else if (isResolved || isSnoozed) {
       actions = RESOLVED_CONVERSATION_ACTIONS;
@@ -400,7 +408,11 @@ export function useConversationHotKeys() {
   const conversationHotKeys = computed(() => {
     if (shouldShowSnoozeOption.value) {
       return prepareActions(
-        [...SNOOZE_CONVERSATION_ACTIONS, ...PENDING_AT_CONVERSATION_ACTIONS],
+        [
+          ...SNOOZE_CONVERSATION_ACTIONS,
+          ...PENDING_AT_CONVERSATION_ACTIONS,
+          ...OPEN_AT_CONVERSATION_ACTIONS,
+        ],
         t
       );
     }
