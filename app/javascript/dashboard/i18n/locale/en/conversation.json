@@ -112,8 +112,8 @@
     },
     "RESOLVE_DROPDOWN": {
       "MARK_PENDING": "Mark as pending",
-      "OPEN_AT": "Open at",
-      "PENDING_AT": "Pending at",
+      "OPEN_AT": "Open Until",
+      "PENDING_AT": "Pending Until",
       "PENDING_NOW": "Pending Now",
       "SNOOZE_UNTIL": "Snooze",
       "SNOOZE": {

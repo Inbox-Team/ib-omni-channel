@@ -7,10 +7,8 @@ class Conversations::PendingToOpenJob < ApplicationJob
       .where.not(snoozed_until: nil)
       .where(snoozed_until: 3.days.ago..Time.current)
       .find_each(batch_size: 100) do |conversation|
+        conversation.snoozed_until = nil
         conversation.open!
-        # rubocop:disable Rails/SkipsModelValidations
-        conversation.update_column(:snoozed_until, nil)
-        # rubocop:enable Rails/SkipsModelValidations
       end
   end
 end
