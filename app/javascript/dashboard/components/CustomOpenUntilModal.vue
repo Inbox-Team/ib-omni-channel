@@ -44,7 +44,7 @@ export default {
 <template>
   <div class="flex flex-col">
     <woot-modal-header
-      :header-title="$t('CONVERSATION.CUSTOM_OPEN_UNTIL.TITLE')"
+      :header-title="$t('CONVERSATION.CUSTOM_PENDING_AT.TITLE')"
     />
     <form
       class="modal-content w-full pt-2 px-5 pb-6"
@@ -64,12 +64,12 @@ export default {
           faded
           slate
           type="reset"
-          :label="$t('CONVERSATION.CUSTOM_OPEN_UNTIL.CANCEL')"
+          :label="$t('CONVERSATION.CUSTOM_PENDING_AT.CANCEL')"
           @click.prevent="onClose"
         />
         <NextButton
           type="submit"
-          :label="$t('CONVERSATION.CUSTOM_OPEN_UNTIL.APPLY')"
+          :label="$t('CONVERSATION.CUSTOM_PENDING_AT.APPLY')"
         />
       </div>
     </form>
