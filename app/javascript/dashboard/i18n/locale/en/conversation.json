@@ -112,6 +112,8 @@
     "RESOLVE_DROPDOWN": {
       "MARK_PENDING": "Mark as pending",
       "OPEN_UNTIL": "Open until...",
+      "PENDING_AT": "Pending at",
+      "PENDING_NOW": "Pending Now",
       "SNOOZE_UNTIL": "Snooze",
       "SNOOZE": {
         "TITLE": "Snooze until",
