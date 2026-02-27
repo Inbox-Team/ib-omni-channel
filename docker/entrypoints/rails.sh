@@ -30,5 +30,11 @@ do
   sleep 2;
 done
 
+# Precompile assets on first start when not already built (e.g. production Docker image)
+if [ -z "$SKIP_ASSETS_PRECOMPILE" ] && ! ls /app/public/assets/.sprockets-manifest-*.json 1>/dev/null 2>&1; then
+  echo "Precompiling assets..."
+  bundle exec rake assets:precompile
+fi
+
 # Execute the main process of the container
 exec "$@"
