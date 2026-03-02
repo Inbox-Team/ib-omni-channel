@@ -2,7 +2,7 @@ name: Build and Push Chatwoot Image
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev/nova" ]
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: inbox-team/ib-chatwoot-dev
