@@ -100,7 +100,8 @@
       "SNOOZED_UNTIL_TOMORROW": "Snoozed until tomorrow",
       "SNOOZED_UNTIL_NEXT_WEEK": "Snoozed until next week",
       "SNOOZED_UNTIL_NEXT_REPLY": "Snoozed until next reply",
-      "OPEN_UNTIL": "Open until",
+      "OPEN_AT": "Open at",
+      "PENDING_AT": "Pending at",
       "SLA_STATUS": {
         "FRT": "FRT {status}",
         "NRT": "NRT {status}",
@@ -111,7 +112,9 @@
     },
     "RESOLVE_DROPDOWN": {
       "MARK_PENDING": "Mark as pending",
-      "OPEN_UNTIL": "Open until...",
+      "OPEN_AT": "Open Until",
+      "PENDING_AT": "Pending Until",
+      "PENDING_NOW": "Pending Now",
       "SNOOZE_UNTIL": "Snooze",
       "SNOOZE": {
         "TITLE": "Snooze until",
@@ -129,8 +132,8 @@
       "APPLY": "Snooze",
       "CANCEL": "Cancel"
     },
-    "CUSTOM_OPEN_UNTIL": {
-      "TITLE": "Open until",
+    "CUSTOM_PENDING_AT": {
+      "TITLE": "Pending at",
       "APPLY": "Apply",
       "CANCEL": "Cancel"
     },

@@ -3,7 +3,8 @@ import { emitter } from 'shared/helpers/mitt';
 
 import {
   CMD_MUTE_CONVERSATION,
-  CMD_OPEN_UNTIL_CONVERSATION,
+  CMD_OPEN_AT_CONVERSATION,
+  CMD_PENDING_AT_CONVERSATION,
   CMD_REOPEN_CONVERSATION,
   CMD_RESOLVE_CONVERSATION,
   CMD_SEND_TRANSCRIPT,
@@ -58,12 +59,12 @@ export const SNOOZE_CONVERSATION_ACTIONS = [
   ),
 ];
 
-const OPEN_UNTIL_OPTIONS = Object.values(SNOOZE_OPTIONS).filter(
+const PENDING_AT_OPTIONS = Object.values(SNOOZE_OPTIONS).filter(
   option => option !== SNOOZE_OPTIONS.UNTIL_NEXT_REPLY
 );
 
-const createOpenUntilHandlers = (busEventName, parentId, section) =>
-  OPEN_UNTIL_OPTIONS.map(option => ({
+const createPendingAtHandlers = (busEventName, parentId, section) =>
+  PENDING_AT_OPTIONS.map(option => ({
     id: option,
     title: `COMMAND_BAR.COMMANDS.${option.toUpperCase()}`,
     parent: parentId,
@@ -72,18 +73,43 @@ const createOpenUntilHandlers = (busEventName, parentId, section) =>
     handler: () => emitter.emit(busEventName, option),
   }));
 
-export const OPEN_UNTIL_CONVERSATION_ACTIONS = [
+export const PENDING_AT_CONVERSATION_ACTIONS = [
   {
-    id: 'open_until_conversation',
-    title: 'COMMAND_BAR.COMMANDS.OPEN_UNTIL_CONVERSATION',
+    id: 'pending_at_conversation',
+    title: 'COMMAND_BAR.COMMANDS.PENDING_AT_CONVERSATION',
     section: 'COMMAND_BAR.SECTIONS.CONVERSATION',
     icon: ICON_SNOOZE_CONVERSATION,
-    children: OPEN_UNTIL_OPTIONS,
+    children: PENDING_AT_OPTIONS,
   },
-  ...createOpenUntilHandlers(
-    CMD_OPEN_UNTIL_CONVERSATION,
-    'open_until_conversation',
-    'COMMAND_BAR.SECTIONS.OPEN_UNTIL_CONVERSATION'
+  ...createPendingAtHandlers(
+    CMD_PENDING_AT_CONVERSATION,
+    'pending_at_conversation',
+    'COMMAND_BAR.SECTIONS.PENDING_AT_CONVERSATION'
+  ),
+];
+
+const createOpenAtHandlers = (busEventName, parentId, section) =>
+  PENDING_AT_OPTIONS.map(option => ({
+    id: option,
+    title: `COMMAND_BAR.COMMANDS.${option.toUpperCase()}`,
+    parent: parentId,
+    section,
+    icon: ICON_SNOOZE_CONVERSATION,
+    handler: () => emitter.emit(busEventName, option),
+  }));
+
+export const OPEN_AT_CONVERSATION_ACTIONS = [
+  {
+    id: 'open_at_conversation',
+    title: 'COMMAND_BAR.COMMANDS.OPEN_AT_CONVERSATION',
+    section: 'COMMAND_BAR.SECTIONS.CONVERSATION',
+    icon: ICON_SNOOZE_CONVERSATION,
+    children: PENDING_AT_OPTIONS,
+  },
+  ...createOpenAtHandlers(
+    CMD_OPEN_AT_CONVERSATION,
+    'open_at_conversation',
+    'COMMAND_BAR.SECTIONS.OPEN_AT_CONVERSATION'
   ),
 ];
 

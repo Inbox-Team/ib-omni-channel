@@ -42,3 +42,7 @@ jobs:
             RAILS_SERVE_STATIC_FILES=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          
+      - name: Trigger Dokloy Deploy
+        run: |
+          curl -X POST "${{ secrets.DOKLOY_WEBHOOK_URL }}"
