@@ -73,6 +73,7 @@ RUN if [ "$RAILS_ENV" = "production" ]; then \
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm i
+RUN pnpm run build:sdk
 
 COPY . /app
 
