@@ -138,7 +138,8 @@ RUN if [ "$RAILS_ENV" != "production" ]; then \
   && ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
   && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
   && npm install -g pnpm@${PNPM_VERSION} \
-  && pnpm --version; \
+  && pnpm --version\
+  && pnpm run build:sdk; \
   fi
   
   
@@ -147,8 +148,6 @@ COPY --from=pre-builder /app /app
 
 # Copy .git_sha file from pre-builder stage
 COPY --from=pre-builder /app/.git_sha /app/.git_sha
-
-RUN pnpm run build:sdk
 
 WORKDIR /app
 
