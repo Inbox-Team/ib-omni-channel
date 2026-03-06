@@ -73,7 +73,6 @@ RUN if [ "$RAILS_ENV" = "production" ]; then \
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm i
-RUN pnpm run build:sdk
 
 COPY . /app
 
@@ -141,6 +140,8 @@ RUN if [ "$RAILS_ENV" != "production" ]; then \
   && npm install -g pnpm@${PNPM_VERSION} \
   && pnpm --version; \
   fi
+  
+RUN pnpm run build:sdk
 
 COPY --from=pre-builder /gems/ /gems/
 COPY --from=pre-builder /app /app
