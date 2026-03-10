@@ -139,7 +139,7 @@ RUN if [ "$RAILS_ENV" != "production" ]; then \
   && ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
   && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
   && npm install -g pnpm@${PNPM_VERSION} \
-  && pnpm --version\
+  && pnpm --version; \
   fi
   
   
