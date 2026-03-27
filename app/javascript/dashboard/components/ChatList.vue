@@ -8,6 +8,7 @@ import {
   computed,
   watch,
   onMounted,
+  onBeforeUnmount,
   defineEmits,
 } from 'vue';
 import { useStore } from 'vuex';
@@ -48,6 +49,7 @@ import { useEmitter } from 'dashboard/composables/emitter';
 import { useEventListener } from '@vueuse/core';
 
 import { emitter } from 'shared/helpers/mitt';
+import { BUS_EVENTS } from 'shared/constants/busEvents';
 
 import wootConstants from 'dashboard/constants/globals';
 import advancedFilterOptions from './widgets/conversation/advancedFilterItems';
@@ -65,6 +67,7 @@ import {
   filterItemsByPermission,
 } from 'dashboard/helper/permissionsHelper.js';
 import { matchesFilters } from '../store/modules/conversations/helpers/filterHelpers';
+import { HOTEL_BRAND_ATTRIBUTE_KEY } from 'dashboard/composables/conversation/useHotelBrandSidebarFilter';
 import { CONVERSATION_EVENTS } from '../helper/AnalyticsHelper/events';
 import { ASSIGNEE_TYPE_TAB_PERMISSIONS } from 'dashboard/constants/permissions.js';
 
@@ -188,6 +191,20 @@ const hasAppliedFiltersOrActiveFolders = computed(() => {
   return hasAppliedFilters.value || hasActiveFolders.value;
 });
 
+/** Sidebar hotel brand filter uses only `hotel_brand` — keep Mine/Unassigned/All tabs like unfiltered mode */
+const hasOnlyHotelBrandFilter = computed(() => {
+  if (!appliedFilters.value.length) return false;
+  return appliedFilters.value.every(
+    f => f.attributeKey === HOTEL_BRAND_ATTRIBUTE_KEY
+  );
+});
+
+const useAssigneeTabList = computed(() => {
+  if (hasActiveFolders.value) return false;
+  if (!hasAppliedFilters.value) return true;
+  return hasOnlyHotelBrandFilter.value;
+});
+
 const currentUserDetails = computed(() => {
   const { id, name } = currentUser.value;
   return { id, name };
@@ -255,7 +272,9 @@ const conversationListPagination = computed(() => {
     Array.isArray(chatsOnView.value) &&
     !chatsOnView.value.length;
   const isNoFiltersOrFoldersAndChatListNotEmpty =
-    !hasAppliedFiltersOrActiveFolders.value && hasChatsOnView;
+    (!hasAppliedFiltersOrActiveFolders.value ||
+      hasOnlyHotelBrandFilter.value) &&
+    hasChatsOnView;
   const isUnderPerPage =
     chatsOnView.value.length < conversationsPerPage &&
     activeAssigneeTabCount.value < conversationsPerPage &&
@@ -319,7 +338,7 @@ const pageTitle = computed(() => {
 const conversationList = computed(() => {
   let localConversationList = [];
 
-  if (!hasAppliedFiltersOrActiveFolders.value) {
+  if (useAssigneeTabList.value) {
     const filters = conversationFilters.value;
     if (activeAssigneeTab.value === 'me') {
       localConversationList = [...mineChatsList.value(filters)];
@@ -616,7 +635,7 @@ function updateAssigneeTab(selectedTab) {
     resetBulkActions();
     emitter.emit('clearSearchInput');
     activeAssigneeTab.value = selectedTab;
-    if (!currentPage.value) {
+    if (!currentPage.value && !hasOnlyHotelBrandFilter.value) {
       fetchConversations();
     }
   }
@@ -763,6 +782,14 @@ useEmitter('fetch_conversation_stats', () => {
 
 useEventListener(conversationDynamicScroller, 'scroll', handleScroll);
 
+function onConversationFiltersAppliedFromSidebar(mergedFilters) {
+  if (!mergedFilters?.length) {
+    foldersQuery.value = {};
+    return;
+  }
+  foldersQuery.value = filterQueryGenerator(useSnakeCase(mergedFilters));
+}
+
 onMounted(() => {
   store.dispatch('setChatListFilters', conversationFilters.value);
   setFiltersFromUISettings();
@@ -772,6 +799,17 @@ onMounted(() => {
   if (hasActiveFolders.value) {
     store.dispatch('campaigns/get');
   }
+  emitter.on(
+    BUS_EVENTS.CONVERSATION_FILTERS_APPLIED,
+    onConversationFiltersAppliedFromSidebar
+  );
+});
+
+onBeforeUnmount(() => {
+  emitter.off(
+    BUS_EVENTS.CONVERSATION_FILTERS_APPLIED,
+    onConversationFiltersAppliedFromSidebar
+  );
 });
 
 const deleteConversationDialogRef = ref(null);
@@ -886,7 +924,7 @@ watch(conversationFilters, (newVal, oldVal) => {
     />
 
     <ChatTypeTabs
-      v-if="!hasAppliedFiltersOrActiveFolders"
+      v-if="useAssigneeTabList"
       :items="assigneeTabItems"
       :active-tab="activeAssigneeTab"
       is-compact
