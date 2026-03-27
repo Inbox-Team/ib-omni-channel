@@ -5,6 +5,7 @@ import { useSnakeCase } from 'dashboard/composables/useTransformKeys';
 import filterQueryGenerator from 'dashboard/helper/filterQueryGenerator';
 import { emitter } from 'shared/helpers/mitt';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
+import { groupBrandOptionsByName } from 'dashboard/constants/hotelBrandGroups';
 
 export const HOTEL_BRAND_ATTRIBUTE_KEY = 'hotel_brand';
 
@@ -38,6 +39,10 @@ export function useHotelBrandSidebarFilter() {
     const values = hotelBrandAttribute.value?.attributeValues ?? [];
     return values.map(v => ({ id: v, name: v }));
   });
+
+  const groupedBrandOptions = computed(() =>
+    groupBrandOptionsByName(brandOptions.value)
+  );
 
   const selectedHotelBrandValue = computed(() => {
     const row = appliedFilters.value.find(
@@ -105,6 +110,7 @@ export function useHotelBrandSidebarFilter() {
     hotelBrandAttribute,
     isHotelBrandFilterAvailable,
     brandOptions,
+    groupedBrandOptions,
     selectedHotelBrandValue,
     hasHotelBrandActiveChild,
     applyHotelBrand,
