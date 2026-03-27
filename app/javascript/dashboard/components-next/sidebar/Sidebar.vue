@@ -21,6 +21,7 @@ import ChannelLeaf from './ChannelLeaf.vue';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher.vue';
 import Logo from 'next/icon/Logo.vue';
 import ComposeConversation from 'dashboard/components-next/NewConversation/ComposeConversation.vue';
+import SidebarHotelBrandFilter from './SidebarHotelBrandFilter.vue';
 
 const props = defineProps({
   isMobileSidebarOpen: {
@@ -650,11 +651,10 @@ const menuItems = computed(() => {
     </section>
     <nav class="grid overflow-y-scroll flex-grow gap-2 px-2 pb-5 no-scrollbar">
       <ul class="flex flex-col gap-1.5 m-0 list-none">
-        <SidebarGroup
-          v-for="item in menuItems"
-          :key="item.name"
-          v-bind="item"
-        />
+        <template v-for="item in menuItems" :key="item.name">
+          <SidebarGroup v-bind="item" />
+          <SidebarHotelBrandFilter v-if="item.name === 'Conversation'" />
+        </template>
       </ul>
     </nav>
     <section
