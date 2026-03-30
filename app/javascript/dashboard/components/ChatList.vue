@@ -123,6 +123,10 @@ const chatListLoading = useMapGetter('getChatListLoadingStatus');
 const activeInbox = useMapGetter('getSelectedInbox');
 const conversationStats = useMapGetter('conversationStats/getStats');
 const appliedFilters = useMapGetter('getAppliedConversationFiltersV2');
+/** Snake_case — required by `matchesFilters` / `filterHelpers` (V2 getter is camelCase). */
+const appliedConversationFilters = useMapGetter(
+  'getAppliedConversationFilters'
+);
 const folders = useMapGetter('customViews/getConversationCustomViews');
 const agentList = useMapGetter('agents/getAgents');
 const teamsList = useMapGetter('teams/getTeams');
@@ -346,6 +350,15 @@ const conversationList = computed(() => {
       localConversationList = [...unAssignedChatsList.value(filters)];
     } else {
       localConversationList = [...allChatList.value(filters)];
+    }
+    // Mine/Unassigned/All getters only apply inbox/status/labels/etc. — not `appliedFilters`
+    // (e.g. sidebar hotel_brand). Align with `getFilteredConversations` so stale or realtime
+    // rows that do not match active filters never appear in the list.
+    if (hasAppliedFilters.value) {
+      const payload = appliedConversationFilters.value;
+      localConversationList = localConversationList.filter(conversation =>
+        matchesFilters(conversation, payload)
+      );
     }
   } else {
     localConversationList = [...chatLists.value];
