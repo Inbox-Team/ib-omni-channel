@@ -173,6 +173,24 @@ const menuItems = computed(() => {
           to: accountScopedRoute('conversation_unattended'),
         },
         {
+          name: 'AutoMessages',
+          label: t('SIDEBAR.AUTO_MESSAGES'),
+          activeOn: [
+            'conversation_auto_messages',
+            'conversation_through_auto_messages',
+          ],
+          to: accountScopedRoute('conversation_auto_messages'),
+        },
+        {
+          name: 'FailedMessages',
+          label: t('SIDEBAR.FAILED_MESSAGES'),
+          activeOn: [
+            'conversation_failed_messages',
+            'conversation_through_failed_messages',
+          ],
+          to: accountScopedRoute('conversation_failed_messages'),
+        },
+        {
           name: 'Folders',
           label: t('SIDEBAR.CUSTOM_VIEWS_FOLDER'),
           icon: 'i-lucide-folder',

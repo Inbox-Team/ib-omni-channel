@@ -10,6 +10,8 @@
     "TAB_HEADING": "Conversations",
     "MENTION_HEADING": "Mentions",
     "UNATTENDED_HEADING": "Unattended",
+    "AUTO_MESSAGES_HEADING": "Auto messages",
+    "FAILED_MESSAGES_HEADING": "Failed",
     "SEARCH": {
       "INPUT": "Search for People, Chats, Saved Replies .."
     },
