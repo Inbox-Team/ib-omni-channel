@@ -333,6 +333,12 @@ const pageTitle = computed(() => {
   if (props.conversationType === 'unattended') {
     return t('CHAT_LIST.UNATTENDED_HEADING');
   }
+  if (props.conversationType === 'auto_success') {
+    return t('CHAT_LIST.AUTO_MESSAGES_HEADING');
+  }
+  if (props.conversationType === 'auto_failed') {
+    return t('CHAT_LIST.FAILED_MESSAGES_HEADING');
+  }
   if (hasActiveFolders.value) {
     return activeFolder.value.name;
   }
