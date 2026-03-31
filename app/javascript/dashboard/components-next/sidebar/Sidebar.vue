@@ -21,6 +21,7 @@ import ChannelLeaf from './ChannelLeaf.vue';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher.vue';
 import Logo from 'next/icon/Logo.vue';
 import ComposeConversation from 'dashboard/components-next/NewConversation/ComposeConversation.vue';
+import SidebarHotelBrandFilter from './SidebarHotelBrandFilter.vue';
 
 const props = defineProps({
   isMobileSidebarOpen: {
@@ -170,6 +171,24 @@ const menuItems = computed(() => {
           activeOn: ['conversation_through_unattended'],
           label: t('SIDEBAR.UNATTENDED_CONVERSATIONS'),
           to: accountScopedRoute('conversation_unattended'),
+        },
+        {
+          name: 'AutoMessages',
+          label: t('SIDEBAR.AUTO_MESSAGES'),
+          activeOn: [
+            'conversation_auto_messages',
+            'conversation_through_auto_messages',
+          ],
+          to: accountScopedRoute('conversation_auto_messages'),
+        },
+        {
+          name: 'FailedMessages',
+          label: t('SIDEBAR.FAILED_MESSAGES'),
+          activeOn: [
+            'conversation_failed_messages',
+            'conversation_through_failed_messages',
+          ],
+          to: accountScopedRoute('conversation_failed_messages'),
         },
         {
           name: 'Folders',
@@ -650,11 +669,10 @@ const menuItems = computed(() => {
     </section>
     <nav class="grid overflow-y-scroll flex-grow gap-2 px-2 pb-5 no-scrollbar">
       <ul class="flex flex-col gap-1.5 m-0 list-none">
-        <SidebarGroup
-          v-for="item in menuItems"
-          :key="item.name"
-          v-bind="item"
-        />
+        <template v-for="item in menuItems" :key="item.name">
+          <SidebarGroup v-bind="item" />
+          <SidebarHotelBrandFilter v-if="item.name === 'Conversation'" />
+        </template>
       </ul>
     </nav>
     <section

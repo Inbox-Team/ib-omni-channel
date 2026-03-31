@@ -27,6 +27,10 @@ export const conversationUrl = ({
     url = `accounts/${accountId}/participating/conversations/${id}`;
   } else if (conversationType === 'unattended') {
     url = `accounts/${accountId}/unattended/conversations/${id}`;
+  } else if (conversationType === 'auto_success') {
+    url = `accounts/${accountId}/auto_messages/conversations/${id}`;
+  } else if (conversationType === 'auto_failed') {
+    url = `accounts/${accountId}/failed_messages/conversations/${id}`;
   }
   return url;
 };
@@ -52,6 +56,9 @@ export const conversationListPageURL = ({
     const urlMap = {
       mention: 'mentions/conversations',
       unattended: 'unattended/conversations',
+      participating: 'participating/conversations',
+      auto_success: 'auto_messages/conversations',
+      auto_failed: 'failed_messages/conversations',
     };
     url = `accounts/${accountId}/${urlMap[conversationType]}`;
   }

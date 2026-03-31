@@ -8,6 +8,7 @@ import {
   computed,
   watch,
   onMounted,
+  onBeforeUnmount,
   defineEmits,
 } from 'vue';
 import { useStore } from 'vuex';
@@ -48,6 +49,7 @@ import { useEmitter } from 'dashboard/composables/emitter';
 import { useEventListener } from '@vueuse/core';
 
 import { emitter } from 'shared/helpers/mitt';
+import { BUS_EVENTS } from 'shared/constants/busEvents';
 
 import wootConstants from 'dashboard/constants/globals';
 import advancedFilterOptions from './widgets/conversation/advancedFilterItems';
@@ -65,6 +67,7 @@ import {
   filterItemsByPermission,
 } from 'dashboard/helper/permissionsHelper.js';
 import { matchesFilters } from '../store/modules/conversations/helpers/filterHelpers';
+import { HOTEL_BRAND_ATTRIBUTE_KEY } from 'dashboard/composables/conversation/useHotelBrandSidebarFilter';
 import { CONVERSATION_EVENTS } from '../helper/AnalyticsHelper/events';
 import { ASSIGNEE_TYPE_TAB_PERMISSIONS } from 'dashboard/constants/permissions.js';
 
@@ -120,6 +123,10 @@ const chatListLoading = useMapGetter('getChatListLoadingStatus');
 const activeInbox = useMapGetter('getSelectedInbox');
 const conversationStats = useMapGetter('conversationStats/getStats');
 const appliedFilters = useMapGetter('getAppliedConversationFiltersV2');
+/** Snake_case — required by `matchesFilters` / `filterHelpers` (V2 getter is camelCase). */
+const appliedConversationFilters = useMapGetter(
+  'getAppliedConversationFilters'
+);
 const folders = useMapGetter('customViews/getConversationCustomViews');
 const agentList = useMapGetter('agents/getAgents');
 const teamsList = useMapGetter('teams/getTeams');
@@ -186,6 +193,20 @@ const hasActiveFolders = computed(() => {
 
 const hasAppliedFiltersOrActiveFolders = computed(() => {
   return hasAppliedFilters.value || hasActiveFolders.value;
+});
+
+/** Sidebar hotel brand filter uses only `hotel_brand` — keep Mine/Unassigned/All tabs like unfiltered mode */
+const hasOnlyHotelBrandFilter = computed(() => {
+  if (!appliedFilters.value.length) return false;
+  return appliedFilters.value.every(
+    f => f.attributeKey === HOTEL_BRAND_ATTRIBUTE_KEY
+  );
+});
+
+const useAssigneeTabList = computed(() => {
+  if (hasActiveFolders.value) return false;
+  if (!hasAppliedFilters.value) return true;
+  return hasOnlyHotelBrandFilter.value;
 });
 
 const currentUserDetails = computed(() => {
@@ -255,7 +276,9 @@ const conversationListPagination = computed(() => {
     Array.isArray(chatsOnView.value) &&
     !chatsOnView.value.length;
   const isNoFiltersOrFoldersAndChatListNotEmpty =
-    !hasAppliedFiltersOrActiveFolders.value && hasChatsOnView;
+    (!hasAppliedFiltersOrActiveFolders.value ||
+      hasOnlyHotelBrandFilter.value) &&
+    hasChatsOnView;
   const isUnderPerPage =
     chatsOnView.value.length < conversationsPerPage &&
     activeAssigneeTabCount.value < conversationsPerPage &&
@@ -310,6 +333,12 @@ const pageTitle = computed(() => {
   if (props.conversationType === 'unattended') {
     return t('CHAT_LIST.UNATTENDED_HEADING');
   }
+  if (props.conversationType === 'auto_success') {
+    return t('CHAT_LIST.AUTO_MESSAGES_HEADING');
+  }
+  if (props.conversationType === 'auto_failed') {
+    return t('CHAT_LIST.FAILED_MESSAGES_HEADING');
+  }
   if (hasActiveFolders.value) {
     return activeFolder.value.name;
   }
@@ -319,7 +348,7 @@ const pageTitle = computed(() => {
 const conversationList = computed(() => {
   let localConversationList = [];
 
-  if (!hasAppliedFiltersOrActiveFolders.value) {
+  if (useAssigneeTabList.value) {
     const filters = conversationFilters.value;
     if (activeAssigneeTab.value === 'me') {
       localConversationList = [...mineChatsList.value(filters)];
@@ -327,6 +356,15 @@ const conversationList = computed(() => {
       localConversationList = [...unAssignedChatsList.value(filters)];
     } else {
       localConversationList = [...allChatList.value(filters)];
+    }
+    // Mine/Unassigned/All getters only apply inbox/status/labels/etc. — not `appliedFilters`
+    // (e.g. sidebar hotel_brand). Align with `getFilteredConversations` so stale or realtime
+    // rows that do not match active filters never appear in the list.
+    if (hasAppliedFilters.value) {
+      const payload = appliedConversationFilters.value;
+      localConversationList = localConversationList.filter(conversation =>
+        matchesFilters(conversation, payload)
+      );
     }
   } else {
     localConversationList = [...chatLists.value];
@@ -616,7 +654,7 @@ function updateAssigneeTab(selectedTab) {
     resetBulkActions();
     emitter.emit('clearSearchInput');
     activeAssigneeTab.value = selectedTab;
-    if (!currentPage.value) {
+    if (!currentPage.value && !hasOnlyHotelBrandFilter.value) {
       fetchConversations();
     }
   }
@@ -763,6 +801,14 @@ useEmitter('fetch_conversation_stats', () => {
 
 useEventListener(conversationDynamicScroller, 'scroll', handleScroll);
 
+function onConversationFiltersAppliedFromSidebar(mergedFilters) {
+  if (!mergedFilters?.length) {
+    foldersQuery.value = {};
+    return;
+  }
+  foldersQuery.value = filterQueryGenerator(useSnakeCase(mergedFilters));
+}
+
 onMounted(() => {
   store.dispatch('setChatListFilters', conversationFilters.value);
   setFiltersFromUISettings();
@@ -772,6 +818,17 @@ onMounted(() => {
   if (hasActiveFolders.value) {
     store.dispatch('campaigns/get');
   }
+  emitter.on(
+    BUS_EVENTS.CONVERSATION_FILTERS_APPLIED,
+    onConversationFiltersAppliedFromSidebar
+  );
+});
+
+onBeforeUnmount(() => {
+  emitter.off(
+    BUS_EVENTS.CONVERSATION_FILTERS_APPLIED,
+    onConversationFiltersAppliedFromSidebar
+  );
 });
 
 const deleteConversationDialogRef = ref(null);
@@ -886,7 +943,7 @@ watch(conversationFilters, (newVal, oldVal) => {
     />
 
     <ChatTypeTabs
-      v-if="!hasAppliedFiltersOrActiveFolders"
+      v-if="useAssigneeTabList"
       :items="assigneeTabItems"
       :active-tab="activeAssigneeTab"
       is-compact
