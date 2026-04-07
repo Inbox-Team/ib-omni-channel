@@ -57,7 +57,11 @@ module ActivityMessageHandler
   end
 
   def auto_resolve_message_key(minutes)
-    if minutes >= 1440 && (minutes % 1440).zero?
+    minutes = minutes.to_i
+
+    if minutes <= 0
+      { key: 'auto_resolved', count: nil }
+    elsif minutes >= 1440 && (minutes % 1440).zero?
       { key: 'auto_resolved_days', count: minutes / 1440 }
     elsif minutes >= 60 && (minutes % 60).zero?
       { key: 'auto_resolved_hours', count: minutes / 60 }
@@ -73,7 +77,11 @@ module ActivityMessageHandler
       I18n.t('conversations.activity.status.contact_resolved', contact_name: Current.contact.name.capitalize)
     elsif resolved?
       message_data = auto_resolve_message_key(auto_resolve_after || 0)
-      I18n.t("conversations.activity.status.#{message_data[:key]}", count: message_data[:count])
+      if message_data[:count].nil?
+        I18n.t("conversations.activity.status.#{message_data[:key]}")
+      else
+        I18n.t("conversations.activity.status.#{message_data[:key]}", count: message_data[:count])
+      end
     end
   end
 
