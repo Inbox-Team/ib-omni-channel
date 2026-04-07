@@ -23,6 +23,9 @@ class TriggerScheduledItemsJob < ApplicationJob
     # Job to auto-resolve conversations
     Account::ConversationsResolutionSchedulerJob.perform_later
 
+    # Job to resolve globally stale conversations
+    Conversations::StaleResolutionJob.perform_later
+
     # Job to sync whatsapp templates
     Channels::Whatsapp::TemplatesSyncSchedulerJob.perform_later
 
