@@ -2,12 +2,12 @@ class Conversations::StaleResolutionJob < ApplicationJob
   queue_as :scheduled_jobs
 
   def perform
+    Current.skip_conversation_last_activity_update = true
     stale_conversations.each do |conversation|
-      Current.skip_conversation_last_activity_update = true
       conversation.resolved!
-    ensure
-      Current.skip_conversation_last_activity_update = nil
     end
+  ensure
+    Current.skip_conversation_last_activity_update = nil
   end
 
   private
