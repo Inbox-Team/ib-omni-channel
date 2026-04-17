@@ -53,7 +53,13 @@ module ActivityMessageHandler
                 user_status_change_activity_content(user_name)
               end
 
-    ::Conversations::ActivityMessageJob.perform_later(self, activity_message_params(content)) if content
+    return unless content
+
+    ::Conversations::ActivityMessageJob.perform_later(
+      self,
+      activity_message_params(content),
+      skip_last_activity_update: Current.skip_conversation_last_activity_update
+    )
   end
 
   def auto_resolve_message_key(minutes)

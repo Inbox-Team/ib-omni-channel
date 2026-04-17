@@ -3,7 +3,10 @@ class Conversations::StaleResolutionJob < ApplicationJob
 
   def perform
     stale_conversations.each do |conversation|
+      Current.skip_conversation_last_activity_update = true
       conversation.resolved!
+    ensure
+      Current.skip_conversation_last_activity_update = nil
     end
   end
 
