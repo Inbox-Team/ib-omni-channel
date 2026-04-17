@@ -400,6 +400,7 @@ class Message < ApplicationRecord
   end
 
   def set_conversation_activity
+    return if private?
     return if Current.skip_conversation_last_activity_update && (activity? || template?)
 
     # rubocop:disable Rails/SkipsModelValidations
