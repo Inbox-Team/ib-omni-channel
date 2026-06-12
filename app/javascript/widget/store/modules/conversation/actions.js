@@ -11,7 +11,11 @@ import {
 } from 'widget/api/conversation';
 
 import { ON_CONVERSATION_CREATED } from 'widget/constants/widgetBusEvents';
-import { createTemporaryMessage, getNonDeletedMessages } from './helpers';
+import {
+  createTemporaryMessage,
+  getNonDeletedMessages,
+  hasSuggestionItems,
+} from './helpers';
 import { emitter } from 'shared/helpers/mitt';
 export const actions = {
   createConversation: async ({ commit, dispatch }, params) => {
@@ -30,7 +34,22 @@ export const actions = {
       commit('setConversationUIFlag', { isCreating: false });
     }
   },
-  sendMessage: async ({ dispatch }, params) => {
+  dismissActiveSuggestionChips: ({ commit, getters }) => {
+    const lastMessage = getters.getLastMessage;
+    if (hasSuggestionItems(lastMessage)) {
+      commit('dismissSuggestionChips', lastMessage.id);
+    }
+  },
+  sendSuggestionChip: async ({ dispatch, commit }, { messageId, value }) => {
+    commit('dismissSuggestionChips', messageId);
+    await dispatch('sendMessage', { content: value });
+  },
+  sendMessage: async ({ dispatch, commit, getters }, params) => {
+    const lastMessage = getters.getLastMessage;
+    if (hasSuggestionItems(lastMessage)) {
+      commit('dismissSuggestionChips', lastMessage.id);
+    }
+
     const { content, replyTo } = params;
     const message = createTemporaryMessage({ content, replyTo });
     dispatch('sendMessageWithData', message);
@@ -59,7 +78,9 @@ export const actions = {
     commit('setLastMessageId');
   },
 
-  sendAttachment: async ({ commit }, params) => {
+  sendAttachment: async ({ commit, dispatch }, params) => {
+    dispatch('dismissActiveSuggestionChips');
+
     const {
       attachment: { thumbUrl, fileType },
       meta = {},

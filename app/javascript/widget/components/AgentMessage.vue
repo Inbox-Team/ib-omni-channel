@@ -2,6 +2,7 @@
 import UserMessage from 'widget/components/UserMessage.vue';
 import AgentMessageBubble from 'widget/components/AgentMessageBubble.vue';
 import MessageReplyButton from 'widget/components/MessageReplyButton.vue';
+import SuggestionChips from 'widget/components/SuggestionChips.vue';
 import { messageStamp } from 'shared/helpers/timeHelper';
 import ImageBubble from 'widget/components/ImageBubble.vue';
 import VideoBubble from 'widget/components/VideoBubble.vue';
@@ -14,6 +15,7 @@ import { isASubmittedFormMessage } from 'shared/helpers/MessageTypeHelper';
 import ReplyToChip from 'widget/components/ReplyToChip.vue';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
 import { emitter } from 'shared/helpers/mitt';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'AgentMessage',
@@ -26,6 +28,7 @@ export default {
     FileBubble,
     MessageReplyButton,
     ReplyToChip,
+    SuggestionChips,
   },
   mixins: [configMixin, messageMixin],
   props: {
@@ -45,6 +48,10 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({
+      lastMessage: 'conversation/getLastMessage',
+      isSuggestionDismissed: 'conversation/isSuggestionDismissed',
+    }),
     shouldDisplayAgentMessage() {
       if (
         this.contentType === 'input_select' &&
@@ -131,6 +138,25 @@ export default {
     hasReplyTo() {
       return this.replyTo && (this.replyTo.content || this.replyTo.attachments);
     },
+    suggestionItems() {
+      const items = this.messageContentAttributes?.items;
+      if (!Array.isArray(items)) {
+        return [];
+      }
+
+      return items.filter(item => item?.value);
+    },
+    isLastMessage() {
+      return this.message.id === this.lastMessage?.id;
+    },
+    showSuggestionChips() {
+      return (
+        (!this.contentType || this.contentType === 'text') &&
+        this.suggestionItems.length > 0 &&
+        this.isLastMessage &&
+        !this.isSuggestionDismissed(this.message.id)
+      );
+    },
   },
   watch: {
     message() {
@@ -151,6 +177,12 @@ export default {
     },
     toggleReply() {
       emitter.emit(BUS_EVENTS.TOGGLE_REPLY_TO_MESSAGE, this.message);
+    },
+    onSuggestionSelect(option) {
+      this.$store.dispatch('conversation/sendSuggestionChip', {
+        messageId: this.message.id,
+        value: option.value,
+      });
     },
   },
 };
@@ -195,6 +227,11 @@ export default {
               :message-id="message.id"
               :message-type="messageType"
               :message="message.content"
+            />
+            <SuggestionChips
+              v-if="showSuggestionChips"
+              :items="suggestionItems"
+              @select="onSuggestionSelect"
             />
             <div
               v-if="hasAttachments"

@@ -12,6 +12,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    compact: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['optionSelect'],
   computed: {
@@ -30,7 +34,7 @@ export default {
 <template>
   <li
     class="option"
-    :class="{ 'is-selected': isSelected }"
+    :class="{ 'is-selected': isSelected, 'option--compact': compact }"
     :style="{ borderColor: widgetColor }"
   >
     <button class="option-button button" @click="onClick">
@@ -49,6 +53,19 @@ export default {
     span {
       display: inline-block;
       vertical-align: middle;
+    }
+  }
+
+  &.option--compact {
+    @apply m-0.5 flex items-center;
+
+    .option-button {
+      @apply rounded-[1.25rem] min-h-0 px-2.5 py-1 text-xs flex items-center justify-center ltr:text-center rtl:text-center;
+
+      span {
+        display: inline;
+        line-height: 1;
+      }
     }
   }
 }
