@@ -11,6 +11,15 @@ export default {
       type: Array,
       default: () => [],
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    size: {
+      type: String,
+      default: 'compact',
+      validator: value => ['compact', 'comfortable'].includes(value),
+    },
   },
   emits: ['select'],
   computed: {
@@ -20,9 +29,16 @@ export default {
         id: item.value || index,
       }));
     },
+    wrapperClass() {
+      return this.size === 'comfortable' ? 'mt-2 mb-1' : 'mt-0.5';
+    },
   },
   methods: {
     onSelect(option) {
+      if (this.disabled) {
+        return;
+      }
+
       this.$emit('select', option);
     },
   },
@@ -30,12 +46,15 @@ export default {
 </script>
 
 <template>
-  <ul class="w-full mt-0.5">
+  <ul
+    class="w-full"
+    :class="[wrapperClass, { 'pointer-events-none opacity-50': disabled }]"
+  >
     <ChatOption
       v-for="option in options"
       :key="option.id"
       :action="option"
-      compact
+      :size="size"
       class="list-none p-0"
       @option-select="onSelect"
     />
