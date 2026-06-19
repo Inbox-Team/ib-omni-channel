@@ -48,6 +48,8 @@ export const getters = {
       return hasNotSeen && isOutGoing;
     }).length;
   },
+  isSuggestionDismissed: _state => messageId =>
+    Boolean(_state.dismissedSuggestionMessageIds[messageId]),
   getUnreadTextMessages: (_state, _getters) => {
     const unreadCount = _getters.getUnreadMessageCount;
     const allMessages = [...Object.values(_state.conversations)];

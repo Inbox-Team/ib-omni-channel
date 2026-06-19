@@ -7,14 +7,17 @@ import { isEmptyObject } from 'widget/helpers/utils';
 import { getRegexp } from 'shared/helpers/Validators';
 import { useMessageFormatter } from 'shared/composables/useMessageFormatter';
 import configMixin from 'widget/mixins/configMixin';
-import { FormKit, createInput } from '@formkit/vue';
+import { FormKit, createInput, submitForm } from '@formkit/vue';
 import PhoneInput from 'widget/components/Form/PhoneInput.vue';
+import SuggestionChips from 'widget/components/SuggestionChips.vue';
+import { getRandomPreChatSuggestions } from 'widget/constants/preChatSuggestions';
 
 export default {
   components: {
     CustomButton,
     Spinner,
     FormKit,
+    SuggestionChips,
   },
   mixins: [configMixin],
   props: {
@@ -43,6 +46,7 @@ export default {
         fullName: 'FULL_NAME',
         phoneNumber: 'PHONE_NUMBER',
       },
+      preChatSuggestions: getRandomPreChatSuggestions(),
     };
   },
   computed: {
@@ -243,6 +247,16 @@ export default {
         contactCustomAttributes: this.contactCustomAttributes,
       });
     },
+    onSuggestionSelect(option) {
+      if (this.isCreatingConversation) {
+        return;
+      }
+
+      this.formValues = { ...this.formValues, message: option.value };
+      this.$nextTick(() => {
+        submitForm('pre-chat-form');
+      });
+    },
   },
 };
 </script>
@@ -250,6 +264,7 @@ export default {
 <template>
   <!-- hide the default submit button for now -->
   <FormKit
+    id="pre-chat-form"
     v-model="formValues"
     type="form"
     form-class="flex flex-col flex-1 w-full p-6 overflow-y-auto"
@@ -298,19 +313,29 @@ export default {
       }"
       :has-error-in-phone-input="hasErrorInPhoneInput"
     />
-    <FormKit
-      v-if="!hasActiveCampaign"
-      name="message"
-      type="textarea"
-      :label-class="context => `text-sm font-medium ${labelClass(context)}`"
-      :input-class="context => inputClass(context)"
-      :label="$t('PRE_CHAT_FORM.FIELDS.MESSAGE.LABEL')"
-      :placeholder="$t('PRE_CHAT_FORM.FIELDS.MESSAGE.PLACEHOLDER')"
-      validation="required"
-      :validation-messages="{
-        required: $t('PRE_CHAT_FORM.FIELDS.MESSAGE.ERROR'),
-      }"
-    />
+    <div v-if="!hasActiveCampaign" class="mt-2">
+      <span class="text-sm font-medium text-n-slate-12">
+        {{ $t('PRE_CHAT_FORM.FIELDS.MESSAGE.LABEL') }}
+      </span>
+      <SuggestionChips
+        v-if="preChatSuggestions.length"
+        size="comfortable"
+        :items="preChatSuggestions"
+        :disabled="isCreatingConversation"
+        @select="onSuggestionSelect"
+      />
+      <FormKit
+        name="message"
+        type="textarea"
+        :label-class="context => `hidden ${labelClass(context)}`"
+        :input-class="context => inputClass(context)"
+        :placeholder="$t('PRE_CHAT_FORM.FIELDS.MESSAGE.PLACEHOLDER')"
+        validation="required"
+        :validation-messages="{
+          required: $t('PRE_CHAT_FORM.FIELDS.MESSAGE.ERROR'),
+        }"
+      />
+    </div>
 
     <CustomButton
       class="mt-3 mb-5 font-medium flex items-center justify-center gap-2"
