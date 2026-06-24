@@ -2,7 +2,7 @@ name: Build and Push Chatwoot Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: inbox-team/ib-chatwoot
@@ -35,14 +35,14 @@ jobs:
           file: docker/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:debug
           build-args: |
             RAILS_ENV=production
             BUNDLE_WITHOUT=development:test
             RAILS_SERVE_STATIC_FILES=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          
+
       - name: Trigger Dokloy Deploy
         run: |
           curl -X POST "${{ secrets.DOKLOY_WEBHOOK_URL_PROD }}"
