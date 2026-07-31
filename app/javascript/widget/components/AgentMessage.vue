@@ -51,6 +51,7 @@ export default {
     ...mapGetters({
       lastMessage: 'conversation/getLastMessage',
       isSuggestionDismissed: 'conversation/isSuggestionDismissed',
+      isWaitingForAgentResponse: 'conversation/getIsWaitingForAgentResponse',
     }),
     shouldDisplayAgentMessage() {
       if (
@@ -231,6 +232,7 @@ export default {
             <SuggestionChips
               v-if="showSuggestionChips"
               :items="suggestionItems"
+              :disabled="isWaitingForAgentResponse"
               @select="onSuggestionSelect"
             />
             <div

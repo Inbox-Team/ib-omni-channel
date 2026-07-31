@@ -8,6 +8,7 @@ import { getConversationAPI } from '../../api/conversation';
 const state = {
   id: '',
   status: '',
+  agentBotActive: false,
 };
 
 export const getters = {
@@ -37,6 +38,9 @@ export const mutations = {
   [SET_CONVERSATION_ATTRIBUTES]($state, data) {
     $state.id = data.id;
     $state.status = data.status;
+    if (data.agent_bot_active !== undefined) {
+      $state.agentBotActive = data.agent_bot_active;
+    }
   },
   [UPDATE_CONVERSATION_ATTRIBUTES]($state, data) {
     if (data.id === $state.id) {
@@ -47,6 +51,9 @@ export const mutations = {
   [CLEAR_CONVERSATION_ATTRIBUTES]($state) {
     $state.id = '';
     $state.status = '';
+    if ($state.agentBotActive !== undefined) {
+      $state.agentBotActive = false;
+    }
   },
 };
 

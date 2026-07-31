@@ -27,6 +27,10 @@ export default {
       type: Function,
       default: () => {},
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup() {
     const {
@@ -86,6 +90,8 @@ export default {
       this.isFocused = true;
     },
     handleButtonClick() {
+      if (this.disabled) return;
+
       if (this.userInput && this.userInput.trim()) {
         this.onSendMessage(this.userInput);
       }
@@ -93,6 +99,8 @@ export default {
       this.focusInput();
     },
     handleEnterKeyPress(e) {
+      if (this.disabled) return;
+
       if (e.keyCode === 13 && !e.shiftKey) {
         e.preventDefault();
         this.handleButtonClick();
@@ -108,6 +116,8 @@ export default {
       }
     },
     emojiOnClick(emoji) {
+      if (this.disabled) return;
+
       this.userInput = `${this.userInput}${emoji} `;
     },
     onTypingOff() {
@@ -117,9 +127,13 @@ export default {
       this.toggleTyping('on');
     },
     toggleTyping(typingStatus) {
+      if (this.disabled) return;
+
       this.$store.dispatch('conversation/toggleUserTyping', { typingStatus });
     },
     focusInput() {
+      if (this.disabled) return;
+
       this.$refs.chatInput.focus();
     },
   },
@@ -132,6 +146,7 @@ export default {
     :class="{
       '!shadow-n-brand dark:!shadow-n-brand': isFocused,
       '!shadow-n-strong dark:!shadow-n-strong': !isFocused,
+      'cursor-not-allowed opacity-60': disabled,
     }"
     @keydown.esc="hideEmojiPicker"
   >
@@ -139,9 +154,14 @@ export default {
       id="chat-input"
       ref="chatInput"
       v-model="userInput"
+      :disabled="disabled"
       :rows="1"
-      :aria-label="$t('CHAT_PLACEHOLDER')"
-      :placeholder="$t('CHAT_PLACEHOLDER')"
+      :aria-label="
+        disabled ? $t('WAITING_FOR_AGENT_RESPONSE') : $t('CHAT_PLACEHOLDER')
+      "
+      :placeholder="
+        disabled ? $t('WAITING_FOR_AGENT_RESPONSE') : $t('CHAT_PLACEHOLDER')
+      "
       class="user-message-input reset-base"
       @typing-off="onTypingOff"
       @typing-on="onTypingOn"
@@ -152,10 +172,12 @@ export default {
       <ChatAttachmentButton
         v-if="showAttachment"
         class="text-n-slate-12"
+        :disabled="disabled"
         :on-attach="onSendAttachment"
       />
       <button
         v-if="shouldShowEmojiPicker && hasEmojiPickerEnabled"
+        :disabled="disabled"
         class="flex items-center justify-center min-h-8 min-w-8"
         :aria-label="$t('EMOJI.ARIA_LABEL')"
         @click="toggleEmojiPicker"
@@ -178,6 +200,7 @@ export default {
       <ChatSendButton
         v-if="showSendButton"
         :color="widgetColor"
+        :disabled="disabled"
         @click="handleButtonClick"
       />
     </div>

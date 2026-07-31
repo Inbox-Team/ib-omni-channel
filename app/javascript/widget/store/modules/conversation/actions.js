@@ -44,7 +44,9 @@ export const actions = {
     commit('dismissSuggestionChips', messageId);
     await dispatch('sendMessage', { content: value });
   },
-  sendMessage: async ({ dispatch, commit, getters }, params) => {
+  sendMessage: async ({ dispatch, commit, getters = {} }, params) => {
+    if (getters.getIsWaitingForAgentResponse) return;
+
     const lastMessage = getters.getLastMessage;
     if (hasSuggestionItems(lastMessage)) {
       commit('dismissSuggestionChips', lastMessage.id);
@@ -78,7 +80,9 @@ export const actions = {
     commit('setLastMessageId');
   },
 
-  sendAttachment: async ({ commit, dispatch }, params) => {
+  sendAttachment: async ({ commit, dispatch, getters = {} }, params) => {
+    if (getters.getIsWaitingForAgentResponse) return;
+
     dispatch('dismissActiveSuggestionChips');
 
     const {

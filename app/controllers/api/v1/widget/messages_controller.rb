@@ -7,9 +7,17 @@ class Api::V1::Widget::MessagesController < Api::V1::Widget::BaseController
   end
 
   def create
-    @message = conversation.messages.new(message_params)
-    build_attachment
-    @message.save!
+    conversation.with_lock do
+      @message = conversation.messages.new(message_params)
+
+      if conversation.waiting_for_agent_bot_response?
+        @message.errors.add(:base, I18n.t('conversations.messages.waiting_for_agent_bot_response'))
+        raise ActiveRecord::RecordInvalid, @message
+      end
+
+      build_attachment
+      @message.save!
+    end
   end
 
   def update

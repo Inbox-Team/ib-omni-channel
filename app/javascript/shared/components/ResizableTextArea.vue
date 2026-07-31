@@ -29,6 +29,10 @@ export default {
       type: Number,
       default: 2,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
     // add this as a prop, so that we won't have to add useUISettings
     sendWithSignature: {
       type: Boolean,
@@ -81,6 +85,9 @@ export default {
           this.setCursor();
         });
       }
+    },
+    disabled(isDisabled) {
+      if (isDisabled) this.typingIndicator.stop();
     },
     sendWithSignature(newValue) {
       if (this.allowSignature) {
@@ -149,6 +156,8 @@ export default {
       this.resizeTextarea();
     },
     onKeyup() {
+      if (this.disabled) return;
+
       this.typingIndicator.start();
     },
     onBlur() {
@@ -159,7 +168,7 @@ export default {
       this.$emit('focus');
     },
     focus() {
-      if (this.$refs.textarea) this.$refs.textarea.focus();
+      if (this.$refs.textarea && !this.disabled) this.$refs.textarea.focus();
     },
   },
 };
@@ -171,6 +180,7 @@ export default {
     :placeholder="placeholder"
     :rows="rows"
     :value="modelValue"
+    :disabled="disabled"
     @input="onInput"
     @focus="onFocus"
     @keyup="onKeyup"
