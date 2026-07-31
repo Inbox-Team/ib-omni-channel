@@ -20,10 +20,6 @@ export default {
       type: Function,
       default: () => {},
     },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
   },
   setup() {
     const { canHandleAttachments } = useAttachments();
@@ -54,7 +50,7 @@ export default {
   methods: {
     handleClipboardPaste(e) {
       // If file picker is not enabled, do not allow paste
-      if (!this.canHandleAttachments || this.disabled) return;
+      if (!this.canHandleAttachments) return;
 
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       // items is a DataTransferItemList object which does not have forEach method
@@ -71,8 +67,6 @@ export default {
       return fileType.includes('image') ? 'image' : 'file';
     },
     async onFileUpload(file) {
-      if (this.disabled) return;
-
       if (this.globalConfig.directUploadsEnabled) {
         await this.onDirectFileUpload(file);
       } else {
@@ -157,7 +151,6 @@ export default {
 <template>
   <FileUpload
     ref="upload"
-    :disabled="disabled"
     :size="4096 * 2048"
     :accept="allowedFileTypes"
     :data="{
@@ -166,10 +159,7 @@ export default {
     }"
     @input-file="onFileUpload"
   >
-    <button
-      :disabled="disabled"
-      class="min-h-8 min-w-8 flex items-center justify-center"
-    >
+    <button class="min-h-8 min-w-8 flex items-center justify-center">
       <FluentIcon v-if="!isUploading.image" icon="attach" />
       <Spinner v-if="isUploading" size="small" />
     </button>

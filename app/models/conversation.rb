@@ -143,20 +143,6 @@ class Conversation < ApplicationRecord
     Conversations::MessageWindowService.new(self).can_reply?
   end
 
-  def waiting_for_agent_bot_response?
-    return false unless pending?
-    return false unless webhook_agent_bot_active?
-
-    messages.chat.last&.incoming?
-  end
-
-  def webhook_agent_bot_active?
-    agent_bots = [assignee_agent_bot]
-    agent_bots << inbox.agent_bot if inbox.agent_bot_inbox&.active?
-
-    agent_bots.compact.any? { |agent_bot| agent_bot.outgoing_url.present? }
-  end
-
   def language
     additional_attributes&.dig('conversation_language')
   end

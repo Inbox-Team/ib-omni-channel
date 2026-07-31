@@ -31,7 +31,6 @@ export default {
       conversationAttributes: 'conversationAttributes/getConversationParams',
       widgetColor: 'appConfig/getWidgetColor',
       conversationSize: 'conversation/getConversationSize',
-      isWaitingForAgentResponse: 'conversation/getIsWaitingForAgentResponse',
       currentUser: 'contacts/getCurrentUser',
       isWidgetStyleFlat: 'appConfig/isWidgetStyleFlat',
     }),
@@ -62,8 +61,6 @@ export default {
     ...mapActions('conversation', ['sendMessage', 'sendAttachment']),
     ...mapActions('conversationAttributes', ['getAttributes']),
     async handleSendMessage(content) {
-      if (this.isWaitingForAgentResponse) return;
-
       await this.sendMessage({
         content,
         replyTo: this.inReplyTo ? this.inReplyTo.id : null,
@@ -76,8 +73,6 @@ export default {
       }
     },
     async handleSendAttachment(attachment) {
-      if (this.isWaitingForAgentResponse) return;
-
       await this.sendAttachment({
         attachment,
         replyTo: this.inReplyTo ? this.inReplyTo.id : null,
@@ -131,7 +126,6 @@ export default {
     />
     <ChatInputWrap
       class="shadow-sm"
-      :disabled="isWaitingForAgentResponse"
       :on-send-message="handleSendMessage"
       :on-send-attachment="handleSendAttachment"
     />

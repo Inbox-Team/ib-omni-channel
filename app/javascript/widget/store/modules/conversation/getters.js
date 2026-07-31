@@ -23,23 +23,6 @@ export const getters = {
     }
     return {};
   },
-  getIsWaitingForAgentResponse: (
-    _state,
-    moduleGetters,
-    _rootState,
-    rootGetters
-  ) => {
-    const { status, agentBotActive } =
-      rootGetters['conversationAttributes/getConversationParams'];
-    const lastMessage = moduleGetters.getLastMessage;
-
-    return (
-      status === 'pending' &&
-      agentBotActive &&
-      lastMessage.status !== 'failed' &&
-      lastMessage.message_type === MESSAGE_TYPE.INCOMING
-    );
-  },
   getGroupedConversation: _state => {
     const conversationGroupedByDate = groupBy(
       Object.values(_state.conversations),

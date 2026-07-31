@@ -204,7 +204,6 @@ en:
     captain:
       handoff: 'Transferring to another agent for further assistance.'
     messages:
-      waiting_for_agent_bot_response: Please wait for the assistant to respond before sending another message.
       instagram_story_content: '%{story_sender} mentioned you in the story: '
       instagram_deleted_story_content: This story is no longer available.
       instagram_shared_story_content: 'Shared story'
