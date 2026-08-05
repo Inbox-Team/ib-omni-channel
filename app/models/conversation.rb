@@ -78,6 +78,21 @@ class Conversation < ApplicationRecord
   scope :unassigned, -> { where(assignee_id: nil) }
   scope :assigned, -> { where.not(assignee_id: nil) }
   scope :assigned_to, ->(agent) { where(assignee_id: agent.id) }
+  scope :with_any_non_failed_messages, lambda {
+    failed_status = Message.statuses[:failed]
+    where(
+      'EXISTS (SELECT 1 FROM messages WHERE messages.conversation_id = conversations.id AND messages.status <> ?)',
+      failed_status
+    )
+  }
+  scope :with_only_failed_messages, lambda {
+    failed_status = Message.statuses[:failed]
+    where('EXISTS (SELECT 1 FROM messages WHERE messages.conversation_id = conversations.id)')
+      .where(
+        'NOT EXISTS (SELECT 1 FROM messages WHERE messages.conversation_id = conversations.id AND messages.status <> ?)',
+        failed_status
+      )
+  }
   scope :unattended, -> { where(first_reply_created_at: nil).or(where.not(waiting_since: nil)) }
   scope :resolvable_not_waiting, lambda { |auto_resolve_after|
     return none if auto_resolve_after.to_i.zero?
@@ -230,7 +245,8 @@ class Conversation < ApplicationRecord
   end
 
   def ensure_snooze_until_reset
-    self.snoozed_until = nil unless snoozed?
+    # Keep snoozed_until for snoozed (reopen at), open (pending at), or pending (open at); clear otherwise
+    self.snoozed_until = nil unless snoozed? || open? || pending?
   end
 
   def ensure_waiting_since

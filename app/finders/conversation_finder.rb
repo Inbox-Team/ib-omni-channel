@@ -127,6 +127,10 @@ class ConversationFinder
       @conversations = current_user.participating_conversations.where(account_id: current_account.id)
     when 'unattended'
       @conversations = @conversations.unattended
+    when 'auto_success'
+      @conversations = @conversations.with_any_non_failed_messages
+    when 'auto_failed'
+      @conversations = @conversations.with_only_failed_messages
     end
     @conversations
   end

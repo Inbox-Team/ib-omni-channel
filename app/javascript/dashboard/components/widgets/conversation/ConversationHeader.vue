@@ -46,6 +46,9 @@ const backButtonUrl = computed(() => {
   const conversationTypeMap = {
     conversation_through_mentions: 'mention',
     conversation_through_unattended: 'unattended',
+    conversation_through_participating: 'participating',
+    conversation_through_auto_messages: 'auto_success',
+    conversation_through_failed_messages: 'auto_failed',
   };
   return conversationListPageURL({
     accountId: accountId.value,
@@ -72,12 +75,34 @@ const isSnoozed = computed(
   () => currentChat.value.status === wootConstants.STATUS_TYPE.SNOOZED
 );
 
+const isOpen = computed(
+  () => currentChat.value.status === wootConstants.STATUS_TYPE.OPEN
+);
+
+const isPending = computed(
+  () => currentChat.value.status === wootConstants.STATUS_TYPE.PENDING
+);
+
 const snoozedDisplayText = computed(() => {
   const { snoozed_until: snoozedUntil } = currentChat.value;
   if (snoozedUntil) {
     return `${t('CONVERSATION.HEADER.SNOOZED_UNTIL')} ${snoozedReopenTime(snoozedUntil)}`;
   }
   return t('CONVERSATION.HEADER.SNOOZED_UNTIL_NEXT_REPLY');
+});
+
+const pendingAtDisplayText = computed(() => {
+  if (!isOpen.value) return null;
+  const { snoozed_until: snoozedUntil } = currentChat.value;
+  if (!snoozedUntil) return null;
+  return `${t('CONVERSATION.HEADER.PENDING_AT')} ${snoozedReopenTime(snoozedUntil)}`;
+});
+
+const openAtDisplayText = computed(() => {
+  if (!isPending.value) return null;
+  const { snoozed_until: snoozedUntil } = currentChat.value;
+  if (!snoozedUntil) return null;
+  return `${t('CONVERSATION.HEADER.OPEN_AT')} ${snoozedReopenTime(snoozedUntil)}`;
 });
 
 const inbox = computed(() => {
@@ -137,6 +162,18 @@ const hasSlaPolicyId = computed(() => props.chat?.sla_policy_id);
           <InboxName v-if="hasMultipleInboxes" :inbox="inbox" class="!mx-0" />
           <span v-if="isSnoozed" class="font-medium text-n-amber-10">
             {{ snoozedDisplayText }}
+          </span>
+          <span
+            v-else-if="pendingAtDisplayText"
+            class="font-medium text-n-amber-10"
+          >
+            {{ pendingAtDisplayText }}
+          </span>
+          <span
+            v-else-if="openAtDisplayText"
+            class="font-medium text-n-amber-10"
+          >
+            {{ openAtDisplayText }}
           </span>
         </div>
       </div>

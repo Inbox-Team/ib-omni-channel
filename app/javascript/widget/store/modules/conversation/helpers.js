@@ -53,3 +53,17 @@ export const getNonDeletedMessages = ({ messages }) => {
     item => !(item.content_attributes && item.content_attributes.deleted)
   );
 };
+
+export const hasSuggestionItems = message => {
+  if (!message?.id || message.message_type !== MESSAGE_TYPE.OUTGOING) {
+    return false;
+  }
+
+  const contentType = message.content_type || 'text';
+  if (contentType !== 'text') {
+    return false;
+  }
+
+  const items = message.content_attributes?.items;
+  return Array.isArray(items) && items.some(item => item?.value);
+};

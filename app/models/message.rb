@@ -400,6 +400,9 @@ class Message < ApplicationRecord
   end
 
   def set_conversation_activity
+    return if private?
+    return if Current.skip_conversation_last_activity_update && activity?
+
     # rubocop:disable Rails/SkipsModelValidations
     conversation.update_columns(last_activity_at: created_at)
     # rubocop:enable Rails/SkipsModelValidations

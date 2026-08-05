@@ -84,9 +84,14 @@
       "YOU_ANSWERED": "You answered"
     },
     "HEADER": {
-      "RESOLVE_ACTION": "Resolve",
-      "REOPEN_ACTION": "Reopen",
-      "OPEN_ACTION": "Open",
+      "RESOLVE_ACTION": "Resolve Now",
+      "REOPEN_ACTION": "Reopen Now",
+      "OPEN_ACTION": "Open Now",
+      "STATUS_LABEL": "Status",
+      "STATUS_OPEN": "Open",
+      "STATUS_RESOLVED": "Resolved",
+      "STATUS_SNOOZED": "Snoozed",
+      "STATUS_PENDING": "Pending",
       "MORE_ACTIONS": "More actions",
       "OPEN": "More",
       "CLOSE": "Close",
@@ -95,6 +100,8 @@
       "SNOOZED_UNTIL_TOMORROW": "Snoozed until tomorrow",
       "SNOOZED_UNTIL_NEXT_WEEK": "Snoozed until next week",
       "SNOOZED_UNTIL_NEXT_REPLY": "Snoozed until next reply",
+      "OPEN_AT": "Open at",
+      "PENDING_AT": "Pending at",
       "SLA_STATUS": {
         "FRT": "FRT {status}",
         "NRT": "NRT {status}",
@@ -105,6 +112,9 @@
     },
     "RESOLVE_DROPDOWN": {
       "MARK_PENDING": "Mark as pending",
+      "OPEN_AT": "Open Until",
+      "PENDING_AT": "Pending Until",
+      "PENDING_NOW": "Pending Now",
       "SNOOZE_UNTIL": "Snooze",
       "SNOOZE": {
         "TITLE": "Snooze until",
@@ -120,6 +130,11 @@
     "CUSTOM_SNOOZE": {
       "TITLE": "Snooze until",
       "APPLY": "Snooze",
+      "CANCEL": "Cancel"
+    },
+    "CUSTOM_PENDING_AT": {
+      "TITLE": "Pending at",
+      "APPLY": "Apply",
       "CANCEL": "Cancel"
     },
     "PRIORITY": {

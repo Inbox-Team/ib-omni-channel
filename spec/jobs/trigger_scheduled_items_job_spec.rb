@@ -25,6 +25,11 @@ RSpec.describe TriggerScheduledItemsJob do
     described_class.perform_now
   end
 
+  it 'triggers Conversations::StaleResolutionJob' do
+    expect(Conversations::StaleResolutionJob).to receive(:perform_later).once
+    described_class.perform_now
+  end
+
   it 'triggers Channels::Whatsapp::TemplatesSyncSchedulerJob' do
     expect(Channels::Whatsapp::TemplatesSyncSchedulerJob).to receive(:perform_later).once
     described_class.perform_now
