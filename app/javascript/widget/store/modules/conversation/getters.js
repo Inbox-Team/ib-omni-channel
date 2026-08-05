@@ -23,6 +23,14 @@ export const getters = {
     }
     return {};
   },
+  getIsWaitingForResponse: (_state, moduleGetters) => {
+    const lastMessage = moduleGetters.getLastMessage;
+
+    return (
+      lastMessage.message_type === MESSAGE_TYPE.INCOMING &&
+      lastMessage.status !== 'failed'
+    );
+  },
   getGroupedConversation: _state => {
     const conversationGroupedByDate = groupBy(
       Object.values(_state.conversations),

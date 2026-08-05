@@ -54,12 +54,16 @@ export default {
       isWidgetOpen: 'appConfig/getIsWidgetOpen',
       shouldShowEmojiPicker: 'appConfig/getShouldShowEmojiPicker',
       isAgentTyping: 'conversation/getIsAgentTyping',
+      isWaitingForResponse: 'conversation/getIsWaitingForResponse',
     }),
     showAttachment() {
       return this.canHandleAttachments && this.userInput.length === 0;
     },
     showSendButton() {
       return this.userInput.length > 0;
+    },
+    isSendDisabled() {
+      return this.isAgentTyping || this.isWaitingForResponse;
     },
   },
   watch: {
@@ -87,7 +91,7 @@ export default {
       this.isFocused = true;
     },
     handleButtonClick() {
-      if (this.isAgentTyping) {
+      if (this.isSendDisabled) {
         return;
       }
 
@@ -183,7 +187,7 @@ export default {
       <ChatSendButton
         v-if="showSendButton"
         :color="widgetColor"
-        :disabled="isAgentTyping"
+        :disabled="isSendDisabled"
         @click="handleButtonClick"
       />
     </div>
