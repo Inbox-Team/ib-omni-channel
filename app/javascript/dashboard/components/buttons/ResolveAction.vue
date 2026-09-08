@@ -44,12 +44,17 @@ const isSnoozed = computed(
   () => currentChat.value.status === wootConstants.STATUS_TYPE.SNOOZED
 );
 
-const showAdditionalActions = computed(
-  () => !isPending.value && !isSnoozed.value
-);
+const showAdditionalActions = computed(() => isOpen.value || isPending.value);
 
 const showOpenButton = computed(() => {
   return isPending.value || isSnoozed.value;
+});
+
+const currentStatusLabel = computed(() => {
+  const status = currentChat.value?.status;
+  if (!status) return '';
+  const key = `CONVERSATION.HEADER.STATUS_${status.toUpperCase()}`;
+  return t(key);
 });
 
 const getConversationParams = () => {
@@ -72,9 +77,21 @@ const getConversationParams = () => {
   };
 };
 
-const openSnoozeModal = () => {
+// const openSnoozeModal = () => {
+//   const ninja = document.querySelector('ninja-keys');
+//   ninja.open({ parent: 'snooze_conversation' });
+// };
+
+const openPendingAtModal = () => {
+  closeDropdown();
   const ninja = document.querySelector('ninja-keys');
-  ninja.open({ parent: 'snooze_conversation' });
+  ninja.open({ parent: 'pending_at_conversation' });
+};
+
+const openOpenAtModal = () => {
+  closeDropdown();
+  const ninja = document.querySelector('ninja-keys');
+  ninja.open({ parent: 'open_at_conversation' });
 };
 
 const toggleStatus = (status, snoozedUntil) => {
@@ -133,7 +150,10 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
 </script>
 
 <template>
-  <div class="relative flex items-center justify-end resolve-actions">
+  <div class="relative flex items-center justify-end gap-2 resolve-actions">
+    <span class="text-xs text-n-slate-11 whitespace-nowrap">
+      {{ t('CONVERSATION.HEADER.STATUS_LABEL') }}: {{ currentStatusLabel }}
+    </span>
     <ButtonGroup
       class="rounded-lg shadow outline-1 outline flex-shrink-0"
       :class="!showOpenButton ? 'outline-n-container' : 'outline-transparent'"
@@ -154,7 +174,11 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
         size="sm"
         color="slate"
         no-animation
-        class="ltr:rounded-r-none rtl:rounded-l-none !outline-0"
+        :class="
+          showAdditionalActions
+            ? 'ltr:rounded-r-none rtl:rounded-l-none !outline-0'
+            : 'rounded-lg !outline-0'
+        "
         :is-loading="isLoading"
         @click="onCmdOpenConversation"
       />
@@ -164,6 +188,11 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
         size="sm"
         color="slate"
         no-animation
+        :class="
+          showAdditionalActions
+            ? 'ltr:rounded-r-none rtl:rounded-l-none !outline-0'
+            : '!outline-0'
+        "
         :is-loading="isLoading"
         @click="onCmdOpenConversation"
       />
@@ -186,21 +215,21 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
       class="border rounded-lg shadow-lg border-n-strong dark:border-n-strong box-content p-2 w-fit z-10 bg-n-alpha-3 backdrop-blur-[100px] absolute block left-auto top-full mt-0.5 start-0 xl:start-auto xl:end-0 max-w-[12.5rem] min-w-[9.75rem] [&_ul>li]:mb-0"
     >
       <WootDropdownMenu class="mb-0">
-        <WootDropdownItem v-if="!isPending">
+        <WootDropdownItem v-if="isOpen">
           <Button
-            :label="t('CONVERSATION.RESOLVE_DROPDOWN.SNOOZE_UNTIL')"
+            :label="t('CONVERSATION.RESOLVE_DROPDOWN.PENDING_AT')"
             ghost
             slate
             sm
             start
-            icon="i-lucide-alarm-clock-minus"
+            icon="i-lucide-clock"
             class="w-full"
-            @click="() => openSnoozeModal()"
+            @click="() => openPendingAtModal()"
           />
         </WootDropdownItem>
-        <WootDropdownItem v-if="!isPending">
+        <WootDropdownItem v-if="isOpen">
           <Button
-            :label="t('CONVERSATION.RESOLVE_DROPDOWN.MARK_PENDING')"
+            :label="t('CONVERSATION.RESOLVE_DROPDOWN.PENDING_NOW')"
             ghost
             slate
             sm
@@ -208,6 +237,18 @@ useEmitter(CMD_RESOLVE_CONVERSATION, onCmdResolveConversation);
             icon="i-lucide-circle-dot-dashed"
             class="w-full"
             @click="() => toggleStatus(wootConstants.STATUS_TYPE.PENDING)"
+          />
+        </WootDropdownItem>
+        <WootDropdownItem v-if="isPending">
+          <Button
+            :label="t('CONVERSATION.RESOLVE_DROPDOWN.OPEN_AT')"
+            ghost
+            slate
+            sm
+            start
+            icon="i-lucide-clock"
+            class="w-full"
+            @click="() => openOpenAtModal()"
           />
         </WootDropdownItem>
       </WootDropdownMenu>

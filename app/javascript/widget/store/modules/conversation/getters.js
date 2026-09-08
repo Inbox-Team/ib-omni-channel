@@ -23,6 +23,14 @@ export const getters = {
     }
     return {};
   },
+  getIsWaitingForResponse: (_state, moduleGetters) => {
+    const lastMessage = moduleGetters.getLastMessage;
+
+    return (
+      lastMessage.message_type === MESSAGE_TYPE.INCOMING &&
+      lastMessage.status !== 'failed'
+    );
+  },
   getGroupedConversation: _state => {
     const conversationGroupedByDate = groupBy(
       Object.values(_state.conversations),
@@ -48,6 +56,8 @@ export const getters = {
       return hasNotSeen && isOutGoing;
     }).length;
   },
+  isSuggestionDismissed: _state => messageId =>
+    Boolean(_state.dismissedSuggestionMessageIds[messageId]),
   getUnreadTextMessages: (_state, _getters) => {
     const unreadCount = _getters.getUnreadMessageCount;
     const allMessages = [...Object.values(_state.conversations)];

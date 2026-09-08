@@ -18,14 +18,14 @@ unless Rails.env.production?
   GlobalConfig.clear_cache
 
   account = Account.create!(
-    name: 'Acme Inc'
+    name: 'Kin Hotel'
   )
 
   secondary_account = Account.create!(
-    name: 'Acme Org'
+    name: 'Kin Hotel'
   )
 
-  user = User.new(name: 'John', email: 'john@acme.inc', password: 'Password1!', type: 'SuperAdmin')
+  user = User.new(name: 'admin', email: 'omni-admin@kinhotel.com', password: 'Password1!', type: 'SuperAdmin')
   user.skip_confirmation!
   user.save!
 
@@ -43,7 +43,7 @@ unless Rails.env.production?
 
   web_widget = Channel::WebWidget.create!(account: account, website_url: 'https://acme.inc')
 
-  inbox = Inbox.create!(channel: web_widget, account: account, name: 'Acme Support')
+  inbox = Inbox.create!(channel: web_widget, account: account, name: 'Kin Support')
   InboxMember.create!(user: user, inbox: inbox)
 
   contact_inbox = ContactInboxWithContactBuilder.new(

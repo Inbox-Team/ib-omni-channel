@@ -2,13 +2,11 @@
 import { useKeyboardEvents } from 'dashboard/composables/useKeyboardEvents';
 import { REPLY_EDITOR_MODES, CHAR_LENGTH_WARNING } from './constants';
 import NextButton from 'dashboard/components-next/button/Button.vue';
-import EditorModeToggle from './EditorModeToggle.vue';
 
 export default {
   name: 'ReplyTopPanel',
   components: {
     NextButton,
-    EditorModeToggle,
   },
   props: {
     mode: {
@@ -91,12 +89,16 @@ export default {
 
 <template>
   <div class="flex justify-between h-[3.25rem] gap-2 ltr:pl-3 rtl:pr-3">
-    <EditorModeToggle
-      :mode="mode"
+    <NextButton
+      :variant="mode === REPLY_EDITOR_MODES.REPLY ? 'solid' : 'ghost'"
+      :color="mode === REPLY_EDITOR_MODES.REPLY ? 'blue' : 'slate'"
       :disabled="isReplyRestricted"
       class="mt-3"
-      @toggle-mode="handleModeToggle"
-    />
+      sm
+      @click="handleReplyClick"
+    >
+      {{ $t('CONVERSATION.REPLYBOX.REPLY') }}
+    </NextButton>
     <div class="flex items-center mx-4 my-0">
       <div v-if="isMessageLengthReachingThreshold" class="text-xs">
         <span :class="charLengthClass">
@@ -104,11 +106,22 @@ export default {
         </span>
       </div>
     </div>
-    <NextButton
-      ghost
-      class="ltr:rounded-bl-md rtl:rounded-br-md ltr:rounded-br-none rtl:rounded-bl-none ltr:rounded-tl-none rtl:rounded-tr-none text-n-slate-11 ltr:rounded-tr-[11px] rtl:rounded-tl-[11px]"
-      icon="i-lucide-maximize-2"
-      @click="$emit('togglePopout')"
-    />
+    <div class="flex items-center gap-2">
+      <NextButton
+        :variant="mode === REPLY_EDITOR_MODES.NOTE ? 'solid' : 'ghost'"
+        :color="mode === REPLY_EDITOR_MODES.NOTE ? 'amber' : 'slate'"
+        class="mt-3"
+        sm
+        @click="handleNoteClick"
+      >
+        {{ $t('CONVERSATION.REPLYBOX.PRIVATE_NOTE') }}
+      </NextButton>
+      <NextButton
+        ghost
+        class="ltr:rounded-bl-md rtl:rounded-br-md ltr:rounded-br-none rtl:rounded-bl-none ltr:rounded-tl-none rtl:rounded-tr-none text-n-slate-11 ltr:rounded-tr-[11px] rtl:rounded-tl-[11px]"
+        icon="i-lucide-maximize-2"
+        @click="$emit('togglePopout')"
+      />
+    </div>
   </div>
 </template>

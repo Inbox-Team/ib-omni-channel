@@ -44,6 +44,14 @@ if (isLibraryMode) {
 
 export default defineConfig({
   plugins: plugins,
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+        silenceDeprecations: ['legacy-js-api'],
+      },
+    },
+  },
   build: {
     rollupOptions: {
       output: {

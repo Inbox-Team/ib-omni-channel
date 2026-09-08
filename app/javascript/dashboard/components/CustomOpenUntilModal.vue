@@ -11,7 +11,7 @@ export default {
 
   data() {
     return {
-      snoozeTime: null,
+      openUntilTime: null,
       lang: {
         days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         yearFormat: 'YYYY',
@@ -25,16 +25,14 @@ export default {
       this.$emit('close');
     },
     chooseTime() {
-      this.$emit('chooseTime', this.snoozeTime);
+      this.$emit('chooseTime', this.openUntilTime);
     },
     disabledDate(date) {
-      // Disable all the previous dates
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       return date < yesterday;
     },
     disabledTime(date) {
-      // Allow only time after 1 minute
       const now = new Date();
       now.setMinutes(now.getMinutes() + 1);
       return date < now;
@@ -45,13 +43,15 @@ export default {
 
 <template>
   <div class="flex flex-col">
-    <woot-modal-header :header-title="$t('CONVERSATION.CUSTOM_SNOOZE.TITLE')" />
+    <woot-modal-header
+      :header-title="$t('CONVERSATION.CUSTOM_PENDING_AT.TITLE')"
+    />
     <form
       class="modal-content w-full pt-2 px-5 pb-6"
       @submit.prevent="chooseTime"
     >
       <DatePicker
-        v-model:value="snoozeTime"
+        v-model:value="openUntilTime"
         type="datetime"
         inline
         input-class="mx-input "
@@ -64,12 +64,12 @@ export default {
           faded
           slate
           type="reset"
-          :label="$t('CONVERSATION.CUSTOM_SNOOZE.CANCEL')"
+          :label="$t('CONVERSATION.CUSTOM_PENDING_AT.CANCEL')"
           @click.prevent="onClose"
         />
         <NextButton
           type="submit"
-          :label="$t('CONVERSATION.CUSTOM_SNOOZE.APPLY')"
+          :label="$t('CONVERSATION.CUSTOM_PENDING_AT.APPLY')"
         />
       </div>
     </form>

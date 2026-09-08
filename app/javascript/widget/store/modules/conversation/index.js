@@ -14,6 +14,7 @@ const state = {
     isCreating: false,
   },
   lastMessageId: null,
+  dismissedSuggestionMessageIds: {},
 };
 
 export default {

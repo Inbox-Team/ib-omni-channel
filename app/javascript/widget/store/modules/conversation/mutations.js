@@ -4,6 +4,13 @@ import { findUndeliveredMessage } from './helpers';
 export const mutations = {
   clearConversations($state) {
     $state.conversations = {};
+    $state.dismissedSuggestionMessageIds = {};
+  },
+  dismissSuggestionChips($state, messageId) {
+    $state.dismissedSuggestionMessageIds = {
+      ...$state.dismissedSuggestionMessageIds,
+      [messageId]: true,
+    };
   },
   pushMessageToConversation($state, message) {
     const { id, status, message_type: type } = message;

@@ -199,5 +199,51 @@ export default {
         conversationType: 'participating',
       }),
     },
+    {
+      path: frontendURL('accounts/:accountId/auto_messages/conversations'),
+      name: 'conversation_auto_messages',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: () => ({ conversationType: 'auto_success' }),
+    },
+    {
+      path: frontendURL(
+        'accounts/:accountId/auto_messages/conversations/:conversationId'
+      ),
+      name: 'conversation_through_auto_messages',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: route => ({
+        conversationId: route.params.conversationId,
+        conversationType: 'auto_success',
+      }),
+    },
+    {
+      path: frontendURL('accounts/:accountId/failed_messages/conversations'),
+      name: 'conversation_failed_messages',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: () => ({ conversationType: 'auto_failed' }),
+    },
+    {
+      path: frontendURL(
+        'accounts/:accountId/failed_messages/conversations/:conversationId'
+      ),
+      name: 'conversation_through_failed_messages',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: route => ({
+        conversationId: route.params.conversationId,
+        conversationType: 'auto_failed',
+      }),
+    },
   ],
 };
